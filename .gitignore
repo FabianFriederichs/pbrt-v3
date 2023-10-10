@@ -6,3 +6,5 @@ src/objs
 
 # vscode
 .vscode
+build/
+out/
