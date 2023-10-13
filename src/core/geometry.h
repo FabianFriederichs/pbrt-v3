@@ -837,23 +837,23 @@ class Bounds3 {
                     Float *hitt1 = nullptr) const;
     inline bool IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
                            const int dirIsNeg[3]) const;
-    bool IntersectNRPXP(const Ray &ray, Float *hitt0 = nullptr,
+    bool IntersectNRNXP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
     inline bool IntersectNRNXP(const Ray &ray, const Vector3f &invDir,
                            const int dirIsNeg[3]) const;
-    bool IntersectNRPXP(const Ray &ray, Float *hitt0 = nullptr,
+    bool IntersectNRPYP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
     inline bool IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
                            const int dirIsNeg[3]) const;
-    bool IntersectNRPXP(const Ray &ray, Float *hitt0 = nullptr,
+    bool IntersectNRNYP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
     inline bool IntersectNRNYP(const Ray &ray, const Vector3f &invDir,
                            const int dirIsNeg[3]) const;
-    bool IntersectNRPXP(const Ray &ray, Float *hitt0 = nullptr,
+    bool IntersectNRPZP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
     inline bool IntersectNRPZP(const Ray &ray, const Vector3f &invDir,
                            const int dirIsNeg[3]) const;
-    bool IntersectNRPXP(const Ray &ray, Float *hitt0 = nullptr,
+    bool IntersectNRNZP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
     inline bool IntersectNRNZP(const Ray &ray, const Vector3f &invDir,
                            const int dirIsNeg[3]) const;
@@ -1521,15 +1521,15 @@ inline bool Bounds3<T>::IntersectNRP(const Ray &ray, const Vector3f &invDir,
     switch(rayClass)
     {
         case RayClass::px:
-            return IntersectNRPXP(ray, invDir, rayClass, dirIsNeg);
+            return IntersectNRPXP(ray, invDir, dirIsNeg);
         case RayClass::nx:
-            return IntersectNRNXP(ray, invDir, rayClass, dirIsNeg);
+            return IntersectNRNXP(ray, invDir, dirIsNeg);
         case RayClass::py:
-            return IntersectNRPYP(ray, invDir, rayClass, dirIsNeg);
+            return IntersectNRPYP(ray, invDir, dirIsNeg);
         case RayClass::ny:
-            return IntersectNRNYP(ray, invDir, rayClass, dirIsNeg);
+            return IntersectNRNYP(ray, invDir, dirIsNeg);
         case RayClass::pz:
-            return IntersectNRPZP(ray, invDir, rayClass, dirIsNeg);
+            return IntersectNRPZP(ray, invDir, dirIsNeg);
         default:
             return false;
     }
@@ -1539,7 +1539,11 @@ template <typename T>
 inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, Float *hitt0,
                                    Float *hitt1) const {
     Float t0 = 0, t1 = ray.tMax;
-    for (int i = 0; i < 3; ++i) {
+    // x-slab
+    Float tNear = pMin[0];
+    Float tFar = pMax[0];
+    if ()
+    for (int i = 0; i < 3; ++i) { // TODO: unroll the loop and handle special case for x slab
         // Update interval for _i_th bounding box slab
         Float invRayDir = 1 / ray.d[i];
         Float tNear = (pMin[i] - ray.o[i]) * invRayDir;
@@ -1562,7 +1566,7 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, Float *hitt0,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
                                    const int dirIsNeg[3]) const {
-    const Bounds3f &bounds = *this;
+    const Bounds3f &bounds = *this; // TODO: Handle special case for x slab
     // Check for ray intersection against $x$ and $y$ slabs
     Float tMin = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
     Float tMax = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
