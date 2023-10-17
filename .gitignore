@@ -4,7 +4,8 @@ src/bin
 src/objs
 .sconsign.dblite
 
-# vscode
+# vs / vscode
 .vscode
+.vs
 build/
 out/
