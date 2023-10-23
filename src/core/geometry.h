@@ -1538,12 +1538,10 @@ inline bool Bounds3<T>::IntersectNRP(const Ray &ray, const Vector3f &invDir,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, Float *hitt0,
                                    Float *hitt1) const {
-    Float t0 = 0, t1 = ray.tMax;
-    Float tNear = pMin[0];
-    Float tFar = pMax[0];
+    Float t0 = 0;
+    Float t1 = ray.tMax;   
 
     // --- X slab
-    Float invRayDir = 1 / ray.d[0];
     Float tNear = pMin[0];
     Float tFar = pMax[0];
 
@@ -1619,17 +1617,11 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, Float *hitt0,
                                    Float *hitt1) const {
-   Float t0 = 0, t1 = ray.tMax;
-    Float tNear = pMin[0];
-    Float tFar = pMax[0];
+    Float t0 = 0, t1 = ray.tMax;
 
     // --- X slab
-    Float invRayDir = 1 / ray.d[0];
-    Float tNear = (pMin[0] - ray.o[0]) * invRayDir;
-    Float tFar = (pMax[0] - ray.o[0]) * invRayDir;
-
-    // Update parametric interval from slab intersection $t$ values
-    if (tNear > tFar) std::swap(tNear, tFar);
+    Float tNear = pMin[0];
+    Float tFar = pMax[0];
 
     // Update _tFar_ to ensure robust ray--bounds intersection
     tFar *= 1 + 2 * gamma(3);
@@ -1665,9 +1657,9 @@ inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, Float *hitt0,
     t1 = tFar < t1 ? tFar : t1;
     if (t0 > t1) return false;
 
-    // return result t's
-    if (hitt0) *hitt0 = t0;
-    if (hitt1) *hitt1 = t1;
+    // return result t's (note: t0 and t1 are swapped in the negative case)
+    if (hitt0) *hitt0 = t1;
+    if (hitt1) *hitt1 = t0;
     return true;
 }
 
@@ -1704,13 +1696,21 @@ template <typename T>
 inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, Float *hitt0,
                                    Float *hitt1) const {
     Float t0 = 0, t1 = ray.tMax;
-    Float tNear = pMin[0];
-    Float tFar = pMax[0];
+
+    // --- Y slab
+    Float tNear = pMin[1];
+    Float tFar = pMax[1];
+
+    // Update _tFar_ to ensure robust ray--bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+    t0 = tNear > t0 ? tNear : t0;
+    t1 = tFar < t1 ? tFar : t1;
+    if (t0 > t1) return false;
 
     // --- X slab
     Float invRayDir = 1 / ray.d[0];
-    Float tNear = (pMin[0] - ray.o[0]) * invRayDir;
-    Float tFar = (pMax[0] - ray.o[0]) * invRayDir;
+    tNear = (pMin[0] - ray.o[0]) * invRayDir;
+    tFar = (pMax[0] - ray.o[0]) * invRayDir;
 
     // Update parametric interval from slab intersection $t$ values
     if (tNear > tFar) std::swap(tNear, tFar);
@@ -1719,21 +1719,7 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, Float *hitt0,
     tFar *= 1 + 2 * gamma(3);
     t0 = tNear > t0 ? tNear : t0;
     t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
-
-    // --- Y slab
-    invRayDir = 1 / ray.d[1];
-    tNear = (pMin[1] - ray.o[1]) * invRayDir;
-    tFar = (pMax[1] - ray.o[1]) * invRayDir;
-
-    // Update parametric interval from slab intersection $t$ values
-    if (tNear > tFar) std::swap(tNear, tFar);
-
-    // Update _tFar_ to ensure robust ray--bounds intersection
-    tFar *= 1 + 2 * gamma(3);
-    t0 = tNear > t0 ? tNear : t0;
-    t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
+    if (t0 > t1) return false;    
 
     // --- Z slab
     invRayDir = 1 / ray.d[2];
@@ -1787,14 +1773,22 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, Float *hitt0,
                                    Float *hitt1) const {
-   Float t0 = 0, t1 = ray.tMax;
-    Float tNear = pMin[0];
-    Float tFar = pMax[0];
+    Float t0 = 0, t1 = ray.tMax;
+
+    // --- Y slab
+    Float tNear = pMin[1];
+    Float tFar = pMax[1];
+
+    // Update _tFar_ to ensure robust ray--bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+    t0 = tNear > t0 ? tNear : t0;
+    t1 = tFar < t1 ? tFar : t1;
+    if (t0 > t1) return false;
 
     // --- X slab
     Float invRayDir = 1 / ray.d[0];
-    Float tNear = (pMin[0] - ray.o[0]) * invRayDir;
-    Float tFar = (pMax[0] - ray.o[0]) * invRayDir;
+    tNear = (pMin[0] - ray.o[0]) * invRayDir;
+    tFar = (pMax[0] - ray.o[0]) * invRayDir;
 
     // Update parametric interval from slab intersection $t$ values
     if (tNear > tFar) std::swap(tNear, tFar);
@@ -1803,21 +1797,7 @@ inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, Float *hitt0,
     tFar *= 1 + 2 * gamma(3);
     t0 = tNear > t0 ? tNear : t0;
     t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
-
-    // --- Y slab
-    invRayDir = 1 / ray.d[1];
-    tNear = (pMin[1] - ray.o[1]) * invRayDir;
-    tFar = (pMax[1] - ray.o[1]) * invRayDir;
-
-    // Update parametric interval from slab intersection $t$ values
-    if (tNear > tFar) std::swap(tNear, tFar);
-
-    // Update _tFar_ to ensure robust ray--bounds intersection
-    tFar *= 1 + 2 * gamma(3);
-    t0 = tNear > t0 ? tNear : t0;
-    t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
+    if (t0 > t1) return false;    
 
     // --- Z slab
     invRayDir = 1 / ray.d[2];
@@ -1833,9 +1813,9 @@ inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, Float *hitt0,
     t1 = tFar < t1 ? tFar : t1;
     if (t0 > t1) return false;
 
-    // return result t's
-    if (hitt0) *hitt0 = t0;
-    if (hitt1) *hitt1 = t1;
+    // return result t's (note: t0 and t1 are swapped in the negative case)
+    if (hitt0) *hitt0 = t1;
+    if (hitt1) *hitt1 = t0;
     return true;
 }
 
@@ -1872,13 +1852,21 @@ template <typename T>
 inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, Float *hitt0,
                                    Float *hitt1) const {
     Float t0 = 0, t1 = ray.tMax;
-    Float tNear = pMin[0];
-    Float tFar = pMax[0];
+
+    // --- Z slab
+    Float tNear = pMin[2];
+    Float tFar = pMax[2];
+
+    // Update _tFar_ to ensure robust ray--bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+    t0 = tNear > t0 ? tNear : t0;
+    t1 = tFar < t1 ? tFar : t1;
+    if (t0 > t1) return false;
 
     // --- X slab
     Float invRayDir = 1 / ray.d[0];
-    Float tNear = (pMin[0] - ray.o[0]) * invRayDir;
-    Float tFar = (pMax[0] - ray.o[0]) * invRayDir;
+    tNear = (pMin[0] - ray.o[0]) * invRayDir;
+    tFar = (pMax[0] - ray.o[0]) * invRayDir;
 
     // Update parametric interval from slab intersection $t$ values
     if (tNear > tFar) std::swap(tNear, tFar);
@@ -1901,21 +1889,7 @@ inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, Float *hitt0,
     tFar *= 1 + 2 * gamma(3);
     t0 = tNear > t0 ? tNear : t0;
     t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
-
-    // --- Z slab
-    invRayDir = 1 / ray.d[2];
-    tNear = (pMin[2] - ray.o[2]) * invRayDir;
-    tFar = (pMax[2] - ray.o[2]) * invRayDir;
-
-    // Update parametric interval from slab intersection $t$ values
-    if (tNear > tFar) std::swap(tNear, tFar);
-
-    // Update _tFar_ to ensure robust ray--bounds intersection
-    tFar *= 1 + 2 * gamma(3);
-    t0 = tNear > t0 ? tNear : t0;
-    t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
+    if (t0 > t1) return false;    
 
     // return result t's
     if (hitt0) *hitt0 = t0;
@@ -1956,13 +1930,21 @@ template <typename T>
 inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, Float *hitt0,
                                    Float *hitt1) const {
     Float t0 = 0, t1 = ray.tMax;
-    Float tNear = pMin[0];
-    Float tFar = pMax[0];
+
+    // --- Z slab
+    Float tNear = (pMin[2] - ray.o[2]) * invRayDir;
+    Float tFar = (pMax[2] - ray.o[2]) * invRayDir;
+
+    // Update _tFar_ to ensure robust ray--bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+    t0 = tNear > t0 ? tNear : t0;
+    t1 = tFar < t1 ? tFar : t1;
+    if (t0 > t1) return false;
 
     // --- X slab
     Float invRayDir = 1 / ray.d[0];
-    Float tNear = (pMin[0] - ray.o[0]) * invRayDir;
-    Float tFar = (pMax[0] - ray.o[0]) * invRayDir;
+    tNear = (pMin[0] - ray.o[0]) * invRayDir;
+    tFar = (pMax[0] - ray.o[0]) * invRayDir;
 
     // Update parametric interval from slab intersection $t$ values
     if (tNear > tFar) std::swap(tNear, tFar);
@@ -1985,25 +1967,11 @@ inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, Float *hitt0,
     tFar *= 1 + 2 * gamma(3);
     t0 = tNear > t0 ? tNear : t0;
     t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
+    if (t0 > t1) return false;   
 
-    // --- Z slab
-    invRayDir = 1 / ray.d[2];
-    tNear = (pMin[2] - ray.o[2]) * invRayDir;
-    tFar = (pMax[2] - ray.o[2]) * invRayDir;
-
-    // Update parametric interval from slab intersection $t$ values
-    if (tNear > tFar) std::swap(tNear, tFar);
-
-    // Update _tFar_ to ensure robust ray--bounds intersection
-    tFar *= 1 + 2 * gamma(3);
-    t0 = tNear > t0 ? tNear : t0;
-    t1 = tFar < t1 ? tFar : t1;
-    if (t0 > t1) return false;
-
-    // return result t's
-    if (hitt0) *hitt0 = t0;
-    if (hitt1) *hitt1 = t1;
+    // return result t's (note: t0 and t1 are swapped in the negative case)
+    if (hitt0) *hitt0 = t1;
+    if (hitt1) *hitt1 = t0;
     return true;
 }
 
