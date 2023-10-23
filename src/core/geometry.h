@@ -1588,30 +1588,25 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, Float *hitt0,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
                                    const int dirIsNeg[3]) const {
-    const Bounds3f &bounds = *this; // TODO: Handle special case for x slab
-    // Check for ray intersection against $x$ and $y$ slabs
-    Float tMin = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tMax = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tyMin = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
-    Float tyMax = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Bounds3f& bounds = *this;
 
-    // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
-    tMax *= 1 + 2 * gamma(3);
-    tyMax *= 1 + 2 * gamma(3);
-    if (tMin > tyMax || tyMin > tMax) return false;
-    if (tyMin > tMin) tMin = tyMin;
-    if (tyMax < tMax) tMax = tyMax;
+    // calculate slab intervals
+    const Float tMinX = bounds[0].x;
+    const Float tMaxX = bounds[1].x;
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
-    // Check for ray intersection against $z$ slab
-    Float tzMin = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
-    Float tzMax = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    // get tNear and tFar for x slab
+    const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, 0)));
+    const Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
-    // Update _tzMax_ to ensure robust bounds intersection
-    tzMax *= 1 + 2 * gamma(3);
-    if (tMin > tzMax || tzMin > tMax) return false;
-    if (tzMin > tMin) tMin = tzMin;
-    if (tzMax < tMax) tMax = tzMax;
-    return (tMin < ray.tMax) && (tMax > 0);
+    // Update tFar to ensure robust bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+
+    // return result
+    return tNear <= tFar;
 }
 
 template <typename T>
@@ -1666,30 +1661,25 @@ inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, Float *hitt0,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, const Vector3f &invDir,
                                    const int dirIsNeg[3]) const {
-    const Bounds3f &bounds = *this;
-    // Check for ray intersection against $x$ and $y$ slabs
-    Float tMin = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tMax = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tyMin = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
-    Float tyMax = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Bounds3f& bounds = *this;
 
-    // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
-    tMax *= 1 + 2 * gamma(3);
-    tyMax *= 1 + 2 * gamma(3);
-    if (tMin > tyMax || tyMin > tMax) return false;
-    if (tyMin > tMin) tMin = tyMin;
-    if (tyMax < tMax) tMax = tyMax;
+    // calculate slab intervals
+    const Float tMinX = bounds[0].x;
+    const Float tMaxX = bounds[1].x;
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
-    // Check for ray intersection against $z$ slab
-    Float tzMin = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
-    Float tzMax = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    // get tNear and tFar for x slab
+    const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, 0)));
+    const Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
-    // Update _tzMax_ to ensure robust bounds intersection
-    tzMax *= 1 + 2 * gamma(3);
-    if (tMin > tzMax || tzMin > tMax) return false;
-    if (tzMin > tMin) tMin = tzMin;
-    if (tzMax < tMax) tMax = tzMax;
-    return (tMin < ray.tMax) && (tMax > 0);
+    // Update tFar to ensure robust bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+
+    // return result
+    return tNear <= tFar;
 }
 
 template <typename T>
@@ -1744,30 +1734,25 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, Float *hitt0,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
                                    const int dirIsNeg[3]) const {
-    const Bounds3f &bounds = *this;
-    // Check for ray intersection against $x$ and $y$ slabs
-    Float tMin = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tMax = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tyMin = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
-    Float tyMax = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;
+   const Bounds3f& bounds = *this;
 
-    // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
-    tMax *= 1 + 2 * gamma(3);
-    tyMax *= 1 + 2 * gamma(3);
-    if (tMin > tyMax || tyMin > tMax) return false;
-    if (tyMin > tMin) tMin = tyMin;
-    if (tyMax < tMax) tMax = tyMax;
+    // calculate slab intervals
+    const Float tMinX = bounds[0].x;
+    const Float tMaxX = bounds[1].x;
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
-    // Check for ray intersection against $z$ slab
-    Float tzMin = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
-    Float tzMax = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    // get tNear and tFar for x slab
+    const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, 0)));
+    const Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
-    // Update _tzMax_ to ensure robust bounds intersection
-    tzMax *= 1 + 2 * gamma(3);
-    if (tMin > tzMax || tzMin > tMax) return false;
-    if (tzMin > tMin) tMin = tzMin;
-    if (tzMax < tMax) tMax = tzMax;
-    return (tMin < ray.tMax) && (tMax > 0);
+    // Update tFar to ensure robust bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+
+    // return result
+    return tNear <= tFar;
 }
 
 template <typename T>
@@ -1822,30 +1807,25 @@ inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, Float *hitt0,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, const Vector3f &invDir,
                                    const int dirIsNeg[3]) const {
-    const Bounds3f &bounds = *this;
-    // Check for ray intersection against $x$ and $y$ slabs
-    Float tMin = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tMax = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    Float tyMin = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
-    Float tyMax = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Bounds3f& bounds = *this;
 
-    // Update _tMax_ and _tyMax_ to ensure robust bounds intersection
-    tMax *= 1 + 2 * gamma(3);
-    tyMax *= 1 + 2 * gamma(3);
-    if (tMin > tyMax || tyMin > tMax) return false;
-    if (tyMin > tMin) tMin = tyMin;
-    if (tyMax < tMax) tMax = tyMax;
+    // calculate slab intervals
+    const Float tMinX = bounds[0].x;
+    const Float tMaxX = bounds[1].x;
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
-    // Check for ray intersection against $z$ slab
-    Float tzMin = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
-    Float tzMax = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    // get tNear and tFar for x slab
+    const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, 0)));
+    const Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
-    // Update _tzMax_ to ensure robust bounds intersection
-    tzMax *= 1 + 2 * gamma(3);
-    if (tMin > tzMax || tzMin > tMax) return false;
-    if (tzMin > tMin) tMin = tzMin;
-    if (tzMax < tMax) tMax = tzMax;
-    return (tMin < ray.tMax) && (tMax > 0);
+    // Update tFar to ensure robust bounds intersection
+    tFar *= 1 + 2 * gamma(3);
+
+    // return result
+    return tNear <= tFar;
 }
 
 template <typename T>
