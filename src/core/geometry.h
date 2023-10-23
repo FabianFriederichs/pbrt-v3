@@ -1737,10 +1737,10 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
    const Bounds3f& bounds = *this;
 
     // calculate slab intervals
-    const Float tMinX = bounds[0].x;
-    const Float tMaxX = bounds[1].x;
-    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
-    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;
+    const Float tMinY = bounds[0].y;
+    const Float tMaxY = bounds[1].y;
     const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
     const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
