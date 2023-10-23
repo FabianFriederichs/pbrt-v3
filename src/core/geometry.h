@@ -1734,7 +1734,7 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, Float *hitt0,
 template <typename T>
 inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
                                    const int dirIsNeg[3]) const {
-   const Bounds3f& bounds = *this;
+    const Bounds3f& bounds = *this;
 
     // calculate slab intervals
     const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
