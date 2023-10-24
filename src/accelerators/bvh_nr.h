@@ -68,6 +68,7 @@ class BVHNRAccel : public Aggregate {
 
   private:
     // BVHNRAccel Private Methods
+    Vector3f translateToPositiveOctant(BVHNRBuildNode* root);
     BVHNRBuildNode *recursiveBuild(
         MemoryArena &arena, std::vector<BVHPrimitiveInfo> &primitiveInfo,
         int start, int end, int *totalNodes,
@@ -90,6 +91,7 @@ class BVHNRAccel : public Aggregate {
     // BVHNRAccel Private Data
     const int maxPrimsInNode;
     const SplitMethod splitMethod;
+    Vector3f bvhSpaceOffset;
     std::vector<std::shared_ptr<Primitive>> primitives;
     LinearBVHNRNode *nodes = nullptr;
 };

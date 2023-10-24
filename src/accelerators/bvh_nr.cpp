@@ -184,7 +184,8 @@ BVHNRAccel::BVHNRAccel(std::vector<std::shared_ptr<Primitive>> p,
                    int maxPrimsInNode, SplitMethod splitMethod)
     : maxPrimsInNode(std::min(255, maxPrimsInNode)),
       splitMethod(splitMethod),
-      primitives(std::move(p)) {
+      primitives(std::move(p)),
+      bvhSpaceOffset{} {
     ProfilePhase _(Prof::AccelConstruction);
     if (primitives.empty()) return;
     // Build BVH from _primitives_
@@ -207,6 +208,8 @@ BVHNRAccel::BVHNRAccel(std::vector<std::shared_ptr<Primitive>> p,
                               &totalNodes, orderedPrims);
     primitives.swap(orderedPrims);
     primitiveInfo.resize(0);
+    // Translate BVs to positive octant
+    const auto nroffset{translateToPositiveOctant(root)};
     LOG(INFO) << StringPrintf("BVH created with %d nodes for %d "
                               "primitives (%.2f MB), arena allocated %.2f MB",
                               totalNodes, (int)primitives.size(),
@@ -222,10 +225,38 @@ BVHNRAccel::BVHNRAccel(std::vector<std::shared_ptr<Primitive>> p,
     int offset = 0;
     flattenBVHTree(root, &offset);
     CHECK_EQ(totalNodes, offset);
+    // Store nroffset
+    bvhSpaceOffset = nroffset;
 }
 
 Bounds3f BVHNRAccel::WorldBound() const {
     return nodes ? nodes[0].bounds : Bounds3f();
+}
+
+Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
+    // Translate BVH nodes to positive octant to make normalized ray AABB intersection work
+    const Bounds3f worldBound = WorldBound();
+    Vector3f offset{-worldBound.pMin};
+    // Be conservative and add a small epsilon to the offset
+    const auto eps = std::max({std::abs(offset.x), std::abs(offset.y), std::abs(offset.z)}) * gamma(3);
+    offset += Vector3f{eps, eps, eps};
+
+    // Traverse BVH and translate nodes
+    std::vector<BVHNRBuildNode*> stack;
+    stack.reserve(64);
+    stack.push_back(root);
+    while(!stack.empty())
+    {
+        BVHNRBuildNode* node = stack.back();
+        stack.pop_back();
+        node->bounds.pMin += offset;
+        node->bounds.pMax += offset;
+        if(node->children[0]) stack.push_back(node->children[0]);
+        if(node->children[1]) stack.push_back(node->children[1]);
+    }
+
+    // Return applied offset
+    return offset;
 }
 
 struct BucketInfo {
