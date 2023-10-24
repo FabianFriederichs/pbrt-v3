@@ -696,6 +696,8 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     bool hit = false;
     Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
     int dirIsNeg[3] = {invDir.x < 0, invDir.y < 0, invDir.z < 0};
+    // TODO: Normalize ray (but keep original one, to do ray-primitive intersections)
+    // TODO: Choose intersection variant, based on ray classification
     // Follow ray through BVH nodes to find primitive intersections
     int toVisitOffset = 0, currentNodeIndex = 0;
     int nodesToVisit[64];
@@ -735,6 +737,8 @@ bool BVHNRAccel::IntersectP(const Ray &ray) const {
     ProfilePhase p(Prof::AccelIntersectP);
     Vector3f invDir(1.f / ray.d.x, 1.f / ray.d.y, 1.f / ray.d.z);
     int dirIsNeg[3] = {invDir.x < 0, invDir.y < 0, invDir.z < 0};
+    // TODO: Normalize ray (but keep original one, to do ray-primitive intersections)
+    // TODO: Choose intersection variant, based on ray classification
     int nodesToVisit[64];
     int toVisitOffset = 0, currentNodeIndex = 0;
     while (true) {
