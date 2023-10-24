@@ -233,6 +233,48 @@ Bounds3f BVHNRAccel::WorldBound() const {
     return nodes ? nodes[0].bounds : Bounds3f();
 }
 
+pbrt::detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
+{
+    // Normalize ray (but keep original one, to do ray-primitive intersections)
+    Ray nr{};
+    // find dominant axis
+    // get dominant direction
+    Float maxVal = std::numeric_limits<Float>::lowest();
+    int i = 0;
+    for (int j = 0; j < 3; ++j) {
+        if (std::abs(ray.d[j]) > maxVal) {
+            maxVal = std::abs(ray.d[j]);
+            i = j;
+        }
+    }
+    // calculate class
+    const RayClass rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
+    // ray direction
+    nr.d = ray.d / ray.d[i];
+    // ray origin
+    const float tO = -ray.o[i] / ray.d[i];
+    // ray bounds
+    nr.tMax = ray.o[i] + ray.tMax * ray.d[i];
+    // nr.tMin = ray.o[i] + ray.tMin * ray.d[i];
+    // TODO: swap if dominant direction is negative
+    // ray origin
+    switch(i)
+    {
+        case 0:		
+            nr.o.y = ray.o.y + tO * nr.d.y;
+            nr.o.z = ray.o.z + tO * nr.d.z;
+            break;			
+	    case 1:
+		    nr.o.x = ray.o.x + tO * nr.d.x;
+            nr.o.z = ray.o.z + tO * nr.d.z;
+            break;			
+	    case 2:
+		    nr.o.x = ray.o.x + tO * nr.d.x;
+            nr.o.y = ray.o.y + tO * nr.d.y;
+            break;
+    };    
+}
+
 Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
     // Translate BVH nodes to positive octant to make normalized ray AABB intersection work
     const Bounds3f worldBound = WorldBound();
@@ -696,8 +738,6 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     bool hit = false;
     Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
     int dirIsNeg[3] = {invDir.x < 0, invDir.y < 0, invDir.z < 0};
-    // TODO: Normalize ray (but keep original one, to do ray-primitive intersections)
-    // TODO: Choose intersection variant, based on ray classification
     // Follow ray through BVH nodes to find primitive intersections
     int toVisitOffset = 0, currentNodeIndex = 0;
     int nodesToVisit[64];

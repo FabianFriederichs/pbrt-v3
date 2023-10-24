@@ -51,6 +51,16 @@ struct BVHPrimitiveInfo;
 struct MortonPrimitive;
 struct LinearBVHNRNode;
 
+namespace detail
+{
+  // Ray Normalization return type
+  struct RayNormResult {
+      Ray ray;
+      RayClass rayClass;
+      uint32_t dominantAxis;
+  };
+}
+
 // BVHNRAccel Declarations
 class BVHNRAccel : public Aggregate {
   public:
@@ -69,6 +79,7 @@ class BVHNRAccel : public Aggregate {
   private:
     // BVHNRAccel Private Methods
     Vector3f translateToPositiveOctant(BVHNRBuildNode* root);
+    static detail::RayNormResult normalizeRay(const Ray& ray);
     BVHNRBuildNode *recursiveBuild(
         MemoryArena &arena, std::vector<BVHPrimitiveInfo> &primitiveInfo,
         int start, int end, int *totalNodes,
