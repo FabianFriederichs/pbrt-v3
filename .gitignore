@@ -9,3 +9,6 @@ src/objs
 .vs
 build/
 out/
+
+# CMake
+CMakeUserPresets.json

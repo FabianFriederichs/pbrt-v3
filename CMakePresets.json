@@ -1,0 +1,61 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 23,
+        "patch": 0
+    },
+    "include": [],
+    "configurePresets": [
+        {
+            "name": "general_options",            
+            "displayName": "General Options",
+            "description": "General options for the build",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_VERBOSE_MAKEFILE": "ON"
+            },
+            "hidden": true
+        },
+        {
+            "name": "ninja_debug",
+            "displayName": "Debug (default)",
+            "inherits": "general_options",
+            "description": "Build debug version using Ninja",
+            "binaryDir": "${sourceDir}/build/Debug",
+            "installDir": "${sourceDir}/install/Debug",
+            "cacheVariables": {
+              "CMAKE_BUILD_TYPE": "Debug"
+            },
+            "environment": {
+            }
+        },
+        {
+          "name": "ninja_release",
+          "displayName": "Release (default)",
+          "inherits": "general_options",
+          "description": "Build release version using Ninja",
+          "binaryDir": "${sourceDir}/build/Release",
+          "installDir": "${sourceDir}/install/Release",
+          "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Release"
+          },
+          "environment": {
+          }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "ninja_debug",
+            "displayName": "Debug (default)",
+            "configurePreset": "ninja_debug",
+            "configuration": "Debug"
+        },
+        {
+            "name": "ninja_release",
+            "displayName": "Release (default)",
+            "configurePreset": "ninja_release",
+            "configuration": "Release"
+        }
+    ]
+}
