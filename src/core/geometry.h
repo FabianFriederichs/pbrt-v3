@@ -910,10 +910,10 @@ class Bounds2iIterator : public std::forward_iterator_tag {
 class Ray {
   public:
     // Ray Public Methods
-    Ray() : tMax(Infinity), time(0.f), medium(nullptr) {}
+    Ray() : tMin(0.f), tMax(Infinity), time(0.f), medium(nullptr) {}
     Ray(const Point3f &o, const Vector3f &d, Float tMax = Infinity,
         Float time = 0.f, const Medium *medium = nullptr)
-        : o(o), d(d), tMax(tMax), time(time), medium(medium) {}
+        : o(o), d(d), tMin(0.f), tMax(tMax), time(time), medium(medium) {}
     Point3f operator()(Float t) const { return o + d * t; }
     bool HasNaNs() const { return (o.HasNaNs() || d.HasNaNs() || isNaN(tMax)); }
     RayClass rayClass() const {
@@ -940,6 +940,7 @@ class Ray {
     // Ray Public Data
     Point3f o;
     Vector3f d;
+    mutable Float tMin;
     mutable Float tMax;
     Float time;
     const Medium *medium;

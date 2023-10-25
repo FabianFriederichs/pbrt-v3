@@ -42,6 +42,19 @@
           },
           "environment": {
           }
+        },
+        {
+            "name": "ninja_release_with_debug_info",
+            "displayName": "Release with Debug Info (default)",
+            "inherits": "general_options",
+            "description": "Build release with debug info version using Ninja",
+            "binaryDir": "${sourceDir}/build/ReleaseWithDebugInfo",
+            "installDir": "${sourceDir}/install/ReleaseWithDebugInfo",
+            "cacheVariables": {
+              "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            },
+            "environment": {
+            }
         }
     ],
     "buildPresets": [
@@ -56,6 +69,12 @@
             "displayName": "Release (default)",
             "configurePreset": "ninja_release",
             "configuration": "Release"
+        },
+        {
+            "name": "ninja_release_with_debug_info",
+            "displayName": "Release with Debug Info (default)",
+            "configurePreset": "ninja_release_with_debug_info",
+            "configuration": "RelWithDebInfo"
         }
     ]
 }

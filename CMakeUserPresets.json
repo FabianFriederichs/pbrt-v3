@@ -1,0 +1,83 @@
+{
+    "version": 4,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 23,
+        "patch": 0
+    },
+    "include": [],
+    "configurePresets": [
+        {
+            "name": "debug_gcc",
+            "displayName": "[g++] Debug",
+            "description": "Debug build using GCC",
+            "inherits": "ninja_debug",
+            "environment": {
+                "CC": "gcc",
+                "CXX": "g++"
+            },
+            "cacheVariables": {
+            }
+        },        
+        {
+            "name": "release_gcc",
+            "displayName": "[g++] Release",
+            "description": "Release build using GCC",
+            "inherits": "ninja_release",
+            "environment": {
+                "CC": "gcc",
+                "CXX": "g++"
+            },
+            "cacheVariables": {
+            }
+        },
+        {
+            "name": "release_with_debug_info_gcc",
+            "displayName": "[g++] Release with Debug Info",
+            "description": "Release with debug info build using GCC",
+            "inherits": "ninja_release_with_debug_info",
+            "environment": {
+                "CC": "gcc",
+                "CXX": "g++"
+            },
+            "cacheVariables": {
+            }
+        },
+        {
+            "name": "debug_clang",
+            "displayName": "[clang++] Debug",
+            "description": "Debug build using Clang",
+            "inherits": "ninja_debug",
+            "environment": {
+                "CC": "clang",
+                "CXX": "clang++"
+            },
+            "cacheVariables": {
+            }
+        },
+        {
+            "name": "release_clang",
+            "displayName": "[clang++] Release",
+            "description": "Release build using Clang",
+            "inherits": "ninja_release",
+            "environment": {
+                "CC": "clang",
+                "CXX": "clang++"
+            },
+            "cacheVariables": {
+            }
+        },
+        {
+            "name": "release_with_debug_info_clang",
+            "displayName": "[clang++] Release with Debug Info",
+            "description": "Release with debug info build using Clang",
+            "inherits": "ninja_release_with_debug_info",
+            "environment": {
+                "CC": "clang",
+                "CXX": "clang++"
+            },
+            "cacheVariables": {
+            }
+        }
+    ]
+}

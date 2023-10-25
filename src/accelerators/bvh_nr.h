@@ -57,7 +57,7 @@ namespace detail
   struct RayNormResult {
       Ray ray;
       RayClass rayClass;
-      uint32_t dominantAxis;
+      int dominantAxis;
   };
 }
 

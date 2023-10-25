@@ -250,14 +250,13 @@ pbrt::detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
     // calculate class
     const RayClass rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
     // ray direction
-    nr.d = ray.d / ray.d[i];
+    nr.d = ray.d / ray.d[i];   
+    // ray bounds
+    nr.tMin = ray.o[i] + ray.tMin * ray.d[i];
+    nr.tMax = ray.o[i] + ray.tMax * ray.d[i];
+    if (ray.d[i] < 0.0f) std::swap(nr.tMin, nr.tMax);
     // ray origin
     const float tO = -ray.o[i] / ray.d[i];
-    // ray bounds
-    nr.tMax = ray.o[i] + ray.tMax * ray.d[i];
-    // nr.tMin = ray.o[i] + ray.tMin * ray.d[i];
-    // TODO: swap if dominant direction is negative
-    // ray origin
     switch(i)
     {
         case 0:		
@@ -273,6 +272,7 @@ pbrt::detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
             nr.o.y = ray.o.y + tO * nr.d.y;
             break;
     };    
+    return {nr, rayClass, i};
 }
 
 Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
