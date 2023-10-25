@@ -233,10 +233,10 @@ Bounds3f BVHNRAccel::WorldBound() const {
     return nodes ? nodes[0].bounds : Bounds3f();
 }
 
-pbrt::detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
+detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
 {
     // Normalize ray (but keep original one, to do ray-primitive intersections)
-    Ray nr{};
+    detail::RayNormResult nr{};
     // find dominant axis
     // get dominant direction
     Float maxVal = std::numeric_limits<Float>::lowest();
@@ -250,29 +250,35 @@ pbrt::detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
     // calculate class
     const RayClass rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
     // ray direction
-    nr.d = ray.d / ray.d[i];   
+    nr.ray.d = ray.d / ray.d[i];
     // ray bounds
-    nr.tMin = ray.o[i] + ray.tMin * ray.d[i];
-    nr.tMax = ray.o[i] + ray.tMax * ray.d[i];
-    if (ray.d[i] < 0.0f) std::swap(nr.tMin, nr.tMax);
+    nr.ray.tMin = ray.o[i] + ray.tMin * ray.d[i];
+    nr.ray.tMax = ray.o[i] + ray.tMax * ray.d[i];
+    if (ray.d[i] < 0.0f) std::swap(nr.ray.tMin, nr.ray.tMax);
     // ray origin
     const float tO = -ray.o[i] / ray.d[i];
     switch(i)
     {
         case 0:		
-            nr.o.y = ray.o.y + tO * nr.d.y;
-            nr.o.z = ray.o.z + tO * nr.d.z;
+            nr.ray.o.y = ray.o.y + tO * ray.d.y;
+            nr.ray.o.z = ray.o.z + tO * ray.d.z;
+            nr.invDir = Vector2f{1.0f / nr.ray.d.y, 1.0f / nr.ray.d.z};
+            nr.dirIsNeg = int[2]{ nr.ray.d.y < 0.0f, nr.ray.d.z < 0.0f };
             break;			
 	    case 1:
-		    nr.o.x = ray.o.x + tO * nr.d.x;
-            nr.o.z = ray.o.z + tO * nr.d.z;
+		    nr.ray.o.x = ray.o.x + tO * ray.d.x;
+            nr.ray.o.z = ray.o.z + tO * ray.d.z;
+            nr.invDir = {1.0f / nr.ray.d.x, 1.0f / nr.ray.d.z};
+            nr.dirIsNeg = int[2]{ nr.ray.d.x < 0.0f, nr.ray.d.z < 0.0f };
             break;			
 	    case 2:
-		    nr.o.x = ray.o.x + tO * nr.d.x;
-            nr.o.y = ray.o.y + tO * nr.d.y;
+		    nr.ray.o.x = ray.o.x + tO * ray.d.x;
+            nr.ray.o.y = ray.o.y + tO * ray.d.y;
+            nr.invDir = Vector2f{1.0f / nr.ray.d.x, 1.0f / nr.ray.d.y};
+            nr.dirIsNeg = int[2]{ nr.ray.d.x < 0.0f, nr.ray.d.y < 0.0f };
             break;
     };    
-    return {nr, rayClass, i};
+    return nr;
 }
 
 Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
@@ -738,13 +744,15 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     bool hit = false;
     Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
     int dirIsNeg[3] = {invDir.x < 0, invDir.y < 0, invDir.z < 0};
+    // Normalize ray
+    const auto nr = normalizeRay(ray);
     // Follow ray through BVH nodes to find primitive intersections
     int toVisitOffset = 0, currentNodeIndex = 0;
     int nodesToVisit[64];
     while (true) {
         const LinearBVHNRNode *node = &nodes[currentNodeIndex];
         // Check ray against BVH node
-        if (node->bounds.IntersectP(ray, invDir, dirIsNeg)) {
+        if (node->bounds.IntersectNRP(nr.ray, nr.invDir, nr.rayClass, nr.dirIsNeg)) {
             if (node->nPrimitives > 0) {
                 // Intersect ray with primitives in leaf BVH node
                 for (int i = 0; i < node->nPrimitives; ++i)
@@ -777,13 +785,14 @@ bool BVHNRAccel::IntersectP(const Ray &ray) const {
     ProfilePhase p(Prof::AccelIntersectP);
     Vector3f invDir(1.f / ray.d.x, 1.f / ray.d.y, 1.f / ray.d.z);
     int dirIsNeg[3] = {invDir.x < 0, invDir.y < 0, invDir.z < 0};
-    // TODO: Normalize ray (but keep original one, to do ray-primitive intersections)
-    // TODO: Choose intersection variant, based on ray classification
+    // Normalize ray
+    const auto nr = normalizeRay(ray);
+    // Traverse BVH nodes to find intersections
     int nodesToVisit[64];
     int toVisitOffset = 0, currentNodeIndex = 0;
     while (true) {
         const LinearBVHNRNode *node = &nodes[currentNodeIndex];
-        if (node->bounds.IntersectP(ray, invDir, dirIsNeg)) {
+        if (node->bounds.IntersectNRP(nr.ray, nr.invDir, nr.rayClass, nr.dirIsNeg)) {
             // Process BVH node _node_ for traversal
             if (node->nPrimitives > 0) {
                 for (int i = 0; i < node->nPrimitives; ++i) {
