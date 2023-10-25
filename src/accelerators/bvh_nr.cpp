@@ -263,19 +263,22 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
             nr.ray.o.y = ray.o.y + tO * ray.d.y;
             nr.ray.o.z = ray.o.z + tO * ray.d.z;
             nr.invDir = Vector2f{1.0f / nr.ray.d.y, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg = int[2]{ nr.ray.d.y < 0.0f, nr.ray.d.z < 0.0f };
+            nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.y < 0.0f);
+            nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.z < 0.0f);
             break;			
 	    case 1:
 		    nr.ray.o.x = ray.o.x + tO * ray.d.x;
             nr.ray.o.z = ray.o.z + tO * ray.d.z;
             nr.invDir = {1.0f / nr.ray.d.x, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg = int[2]{ nr.ray.d.x < 0.0f, nr.ray.d.z < 0.0f };
+            nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
+            nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.z < 0.0f);
             break;			
 	    case 2:
 		    nr.ray.o.x = ray.o.x + tO * ray.d.x;
             nr.ray.o.y = ray.o.y + tO * ray.d.y;
             nr.invDir = Vector2f{1.0f / nr.ray.d.x, 1.0f / nr.ray.d.y};
-            nr.dirIsNeg = int[2]{ nr.ray.d.x < 0.0f, nr.ray.d.y < 0.0f };
+            nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
+            nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.y < 0.0f);
             break;
     };    
     return nr;

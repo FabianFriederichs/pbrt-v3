@@ -1625,7 +1625,7 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector2f &invDir,
     const Float tMinY = (bounds[dirIsNeg[0]].y - ray.o.y) * invDir[0];
     const Float tMaxY = (bounds[1 - dirIsNeg[0]].y) * invDir[0];
     const Float tMinZ = (bounds[dirIsNeg[1]].z - ray.o.z) * invDir[1];
-    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1]};
+    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1];
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
@@ -1726,7 +1726,7 @@ inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, const Vector2f &invDir,
     const Float tMinY = (bounds[dirIsNeg[0]].y - ray.o.y) * invDir[0];
     const Float tMaxY = (bounds[1 - dirIsNeg[0]].y) * invDir[0];
     const Float tMinZ = (bounds[dirIsNeg[1]].z - ray.o.z) * invDir[1];
-    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1]};
+    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1];
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
