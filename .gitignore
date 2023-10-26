@@ -9,6 +9,7 @@ src/objs
 .vs
 build/
 out/
+data/
 
 # CMake
 #CMakeUserPresets.json
