@@ -264,7 +264,7 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
             nr.ray.o.y = ray.o.y + tO * ray.d.y;
             nr.ray.o.z = ray.o.z + tO * ray.d.z;
             nr.invDir = {1.0f, 1.0f / nr.ray.d.y, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg[0] = static_cast<typename std::underlying_type<RayClass>::type>(rayClass) & 1;
+            nr.dirIsNeg[0] = 0;
             nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.y < 0.0f);
             nr.dirIsNeg[2] = static_cast<int>(nr.ray.d.z < 0.0f);
             break;			
@@ -273,7 +273,7 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
             nr.ray.o.z = ray.o.z + tO * ray.d.z;
             nr.invDir = {1.0f / nr.ray.d.x, 1.0f, 1.0f / nr.ray.d.z};
             nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
-            nr.dirIsNeg[1] = static_cast<typename std::underlying_type<RayClass>::type>(rayClass) & 1;
+            nr.dirIsNeg[1] = 0;
             nr.dirIsNeg[2] = static_cast<int>(nr.ray.d.z < 0.0f);
             break;			
 	    case 2:
@@ -282,7 +282,7 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
             nr.invDir = {1.0f / nr.ray.d.x, 1.0f / nr.ray.d.y, 1.0f};
             nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
             nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.y < 0.0f);
-            nr.dirIsNeg[2] = static_cast<typename std::underlying_type<RayClass>::type>(rayClass) & 1;
+            nr.dirIsNeg[2] = 0;
             break;
     };    
     return nr;
@@ -769,7 +769,7 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
             } else {
                 // Put far BVH node on _nodesToVisit_ stack, advance to near
                 // node
-                if (dirIsNeg[node->axis]) {
+                if (nr.dirIsNeg[node->axis]) {
                     nodesToVisit[toVisitOffset++] = currentNodeIndex + 1;
                     currentNodeIndex = node->secondChildOffset;
                 } else {
@@ -807,7 +807,7 @@ bool BVHNRAccel::IntersectP(const Ray &ray) const {
                 if (toVisitOffset == 0) break;
                 currentNodeIndex = nodesToVisit[--toVisitOffset];
             } else {
-                if (dirIsNeg[node->axis]) {
+                if (nr.dirIsNeg[node->axis]) {
                     /// second child first
                     nodesToVisit[toVisitOffset++] = currentNodeIndex + 1;
                     currentNodeIndex = node->secondChildOffset;

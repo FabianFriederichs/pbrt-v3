@@ -940,7 +940,17 @@ class Ray {
 
     // Ray Public Data
     Point3f o;
-    Vector3f d;f
+    Vector3f d;
+    mutable Float tMin;
+    mutable Float tMax;
+    Float time;
+    const Medium *medium;
+};
+
+class RayDifferential : public Ray {
+  public:
+    // RayDifferential Public Methods
+    RayDifferential() { hasDifferentials = false; }
     RayDifferential(const Point3f &o, const Vector3f &d, Float tMax = Infinity,
                     Float time = 0.f, const Medium *medium = nullptr)
         : Ray(o, d, tMax, time, medium) {
