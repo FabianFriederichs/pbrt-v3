@@ -12,6 +12,8 @@
             "displayName": "[g++] Debug",
             "description": "Debug build using GCC",
             "inherits": "ninja_debug",
+            "binaryDir": "${sourceDir}/build/gcc/debug",
+            "installDir": "${sourceDir}/install/gcc/debug",
             "environment": {
                 "CC": "gcc",
                 "CXX": "g++"
@@ -24,6 +26,8 @@
             "displayName": "[g++] Release",
             "description": "Release build using GCC",
             "inherits": "ninja_release",
+            "binaryDir": "${sourceDir}/build/gcc/release",
+            "installDir": "${sourceDir}/install/gcc/release",
             "environment": {
                 "CC": "gcc",
                 "CXX": "g++"
@@ -36,6 +40,8 @@
             "displayName": "[g++] Release with Debug Info",
             "description": "Release with debug info build using GCC",
             "inherits": "ninja_release_with_debug_info",
+            "binaryDir": "${sourceDir}/build/gcc/release_wdbgi",
+            "installDir": "${sourceDir}/install/gcc/release_wdbgi",
             "environment": {
                 "CC": "gcc",
                 "CXX": "g++"
@@ -48,6 +54,8 @@
             "displayName": "[clang++] Debug",
             "description": "Debug build using Clang",
             "inherits": "ninja_debug",
+            "binaryDir": "${sourceDir}/build/clang/debug",
+            "installDir": "${sourceDir}/install/clang/debug",
             "environment": {
                 "CC": "clang",
                 "CXX": "clang++"
@@ -60,6 +68,8 @@
             "displayName": "[clang++] Release",
             "description": "Release build using Clang",
             "inherits": "ninja_release",
+            "binaryDir": "${sourceDir}/build/clang/release",
+            "installDir": "${sourceDir}/install/clang/release",
             "environment": {
                 "CC": "clang",
                 "CXX": "clang++"
@@ -72,6 +82,8 @@
             "displayName": "[clang++] Release with Debug Info",
             "description": "Release with debug info build using Clang",
             "inherits": "ninja_release_with_debug_info",
+            "binaryDir": "${sourceDir}/build/clang/release_wdbgi",
+            "installDir": "${sourceDir}/install/clang/release_wdbgi",
             "environment": {
                 "CC": "clang",
                 "CXX": "clang++"

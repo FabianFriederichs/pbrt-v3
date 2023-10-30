@@ -236,6 +236,7 @@ Bounds3f BVHNRAccel::WorldBound() const {
 
 detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
 {
+    ProfilePhase(Prof::RayNormalization);
     // Normalize ray (but keep original one, to do ray-primitive intersections)
     detail::RayNormResult nr{};
     // find dominant axis
