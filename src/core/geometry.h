@@ -43,6 +43,7 @@
 #include "stringprint.h"
 #include <iterator>
 #include <array>
+#include <cstdint>
 
 namespace pbrt {
 
@@ -746,7 +747,7 @@ class Bounds2 {
     Point2<T> pMin, pMax;
 };
 
-enum class RayClass : int {
+enum class RayClass : std::uint32_t {
     px,
     nx,
     py,
@@ -830,33 +831,33 @@ class Bounds3 {
     // --- normalized ray variants
     bool IntersectNRP(const Ray &ray, RayClass rayClass, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
-    inline bool IntersectNRP(const Ray &ray, const Vector2f &invDir,
-                           RayClass rayClass, const int dirIsNeg[2]) const;
+    inline bool IntersectNRP(const Ray &ray, const Vector3f &invDir,
+                           RayClass rayClass, const int dirIsNeg[3]) const;
     // one variant per ray class (px, nx, py, ny, pz, nz)
     bool IntersectNRPXP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
-    inline bool IntersectNRPXP(const Ray &ray, const Vector2f &invDir,
-                           const int dirIsNeg[2]) const;
+    inline bool IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
+                           const int dirIsNeg[3]) const;
     bool IntersectNRNXP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
-    inline bool IntersectNRNXP(const Ray &ray, const Vector2f &invDir,
-                           const int dirIsNeg[2]) const;
+    inline bool IntersectNRNXP(const Ray &ray, const Vector3f &invDir,
+                           const int dirIsNeg[3]) const;
     bool IntersectNRPYP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
-    inline bool IntersectNRPYP(const Ray &ray, const Vector2f &invDir,
-                           const int dirIsNeg[2]) const;
+    inline bool IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
+                           const int dirIsNeg[3]) const;
     bool IntersectNRNYP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
-    inline bool IntersectNRNYP(const Ray &ray, const Vector2f &invDir,
-                           const int dirIsNeg[2]) const;
+    inline bool IntersectNRNYP(const Ray &ray, const Vector3f &invDir,
+                           const int dirIsNeg[3]) const;
     bool IntersectNRPZP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
-    inline bool IntersectNRPZP(const Ray &ray, const Vector2f &invDir,
-                           const int dirIsNeg[2]) const;
+    inline bool IntersectNRPZP(const Ray &ray, const Vector3f &invDir,
+                           const int dirIsNeg[3]) const;
     bool IntersectNRNZP(const Ray &ray, Float *hitt0 = nullptr,
                     Float *hitt1 = nullptr) const;
-    inline bool IntersectNRNZP(const Ray &ray, const Vector2f &invDir,
-                           const int dirIsNeg[2]) const;
+    inline bool IntersectNRNZP(const Ray &ray, const Vector3f &invDir,
+                           const int dirIsNeg[3]) const;
     // ---
     friend std::ostream &operator<<(std::ostream &os, const Bounds3<T> &b) {
         os << "[ " << b.pMin << " - " << b.pMax << " ]";
@@ -939,17 +940,7 @@ class Ray {
 
     // Ray Public Data
     Point3f o;
-    Vector3f d;
-    mutable Float tMin;
-    mutable Float tMax;
-    Float time;
-    const Medium *medium;
-};
-
-class RayDifferential : public Ray {
-  public:
-    // RayDifferential Public Methods
-    RayDifferential() { hasDifferentials = false; }
+    Vector3f d;f
     RayDifferential(const Point3f &o, const Vector3f &d, Float tMax = Infinity,
                     Float time = 0.f, const Medium *medium = nullptr)
         : Ray(o, d, tMax, time, medium) {
@@ -1516,8 +1507,8 @@ inline bool Bounds3<T>::IntersectNRP(const Ray &ray, RayClass rayClass, Float *h
 }
 
 template <typename T>
-inline bool Bounds3<T>::IntersectNRP(const Ray &ray, const Vector2f &invDir,
-                                   RayClass rayClass, const int dirIsNeg[2]) const {
+inline bool Bounds3<T>::IntersectNRP(const Ray &ray, const Vector3f &invDir,
+                                   RayClass rayClass, const int dirIsNeg[3]) const {
     // call respective intersection function for the ray class
     switch(rayClass)
     {
@@ -1569,17 +1560,17 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, Float *hitt0,
 }
 
 template <typename T>
-inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector2f &invDir,
-                                   const int dirIsNeg[2]) const {
+inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
+                                   const int dirIsNeg[3]) const {
     const Bounds3f& bounds = *this;
 
     // calculate slab intervals
     const Float tMinX = bounds[0].x;
     const Float tMaxX = bounds[1].x;
-    const Float tMinY = (bounds[dirIsNeg[0]].y - ray.o.y) * invDir[0];
-    const Float tMaxY = (bounds[1 - dirIsNeg[0]].y) * invDir[0];
-    const Float tMinZ = (bounds[dirIsNeg[1]].z - ray.o.z) * invDir[1];
-    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1];
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
@@ -1625,17 +1616,17 @@ inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, Float *hitt0,
 }
 
 template <typename T>
-inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, const Vector2f &invDir,
-                                   const int dirIsNeg[2]) const {
+inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, const Vector3f &invDir,
+                                   const int dirIsNeg[3]) const {
     const Bounds3f& bounds = *this;
 
     // calculate slab intervals
     const Float tMinX = bounds[0].x;
     const Float tMaxX = bounds[1].x;
-    const Float tMinY = (bounds[dirIsNeg[0]].y - ray.o.y) * invDir[0];
-    const Float tMaxY = (bounds[1 - dirIsNeg[0]].y) * invDir[0];
-    const Float tMinZ = (bounds[dirIsNeg[1]].z - ray.o.z) * invDir[1];
-    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1];
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
@@ -1681,17 +1672,17 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, Float *hitt0,
 }
 
 template <typename T>
-inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector2f &invDir,
-                                   const int dirIsNeg[2]) const {
+inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
+                                   const int dirIsNeg[3]) const {
     const Bounds3f& bounds = *this;
 
     // calculate slab intervals
     const Float tMinY = bounds[0].y;
     const Float tMaxY = bounds[1].y;
-    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir[0];
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir[0];    
-    const Float tMinZ = (bounds[dirIsNeg[1]].z - ray.o.z) * invDir[1];
-    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1];
+    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;    
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
@@ -1737,17 +1728,17 @@ inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, Float *hitt0,
 }
 
 template <typename T>
-inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, const Vector2f &invDir,
-                                   const int dirIsNeg[2]) const {
+inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, const Vector3f &invDir,
+                                   const int dirIsNeg[3]) const {
     const Bounds3f& bounds = *this;
 
     // calculate slab intervals
     const Float tMinY = bounds[0].y;
     const Float tMaxY = bounds[1].y;
-    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir[0];
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir[0];    
-    const Float tMinZ = (bounds[dirIsNeg[1]].z - ray.o.z) * invDir[1];
-    const Float tMaxZ = (bounds[1 - dirIsNeg[1]].z - ray.o.z) * invDir[1];
+    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;    
+    const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
+    const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
@@ -1793,17 +1784,17 @@ inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, Float *hitt0,
 }
 
 template <typename T>
-inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, const Vector2f &invDir,
-                                   const int dirIsNeg[2]) const {
+inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, const Vector3f &invDir,
+                                   const int dirIsNeg[3]) const {
     const Bounds3f& bounds = *this;
 
     // calculate slab intervals
     const Float tMinZ = bounds[0].z;
     const Float tMaxZ = bounds[1].z;
-    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir[0];
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir[0];
-    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir[1];
-    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir[1];    
+    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;    
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
@@ -1849,17 +1840,17 @@ inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, Float *hitt0,
 }
 
 template <typename T>
-inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, const Vector2f &invDir,
-                                   const int dirIsNeg[2]) const {
+inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, const Vector3f &invDir,
+                                   const int dirIsNeg[3]) const {
     const Bounds3f& bounds = *this;
 
     // calculate slab intervals
     const Float tMinZ = bounds[0].z;
     const Float tMaxZ = bounds[1].z;
-    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir[0];
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir[0];
-    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir[1];
-    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir[1];        
+    const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;
+    const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;        
 
     // get tNear and tFar for x slab
     const Float tNear = std::max(tMinX, std::max(tMinY, std::max(tMinZ, ray.tMin)));
