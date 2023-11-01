@@ -234,7 +234,7 @@ Bounds3f BVHNRAccel::WorldBound() const {
     return nodes ? nodes[0].bounds : Bounds3f();
 }
 
-detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
+detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
 {
     ProfilePhase p(Prof::RayNormalization);
     // Normalize ray (but keep original one, to do ray-primitive intersections)
@@ -252,38 +252,42 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
     // calculate class
     const RayClass rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
     // ray direction
-    nr.ray.d = ray.d / ray.d[i];
+    nr.ray.d[i] = 1.0f;
+    for (int j = 0; j < 3; ++j)
+    {
+        if(j != i) nr.ray.d[j] = ray.d[j] / ray.d[i];
+    }
     // ray bounds
     nr.ray.tMin = ray.o[i] + ray.tMin * ray.d[i];
     nr.ray.tMax = ray.o[i] + ray.tMax * ray.d[i];
     if (ray.d[i] < 0.0f) std::swap(nr.ray.tMin, nr.ray.tMax);
+    nr.dirIsNeg[i] = 0;
     // ray origin
+    // first apply offset
+    const Vector3f o = Vector3f(ray.o) + bvhSpaceOffset;
     const float tO = -ray.o[i] / ray.d[i];
     switch(i)
     {
         case 0:		
-            nr.ray.o.y = ray.o.y + tO * ray.d.y;
-            nr.ray.o.z = ray.o.z + tO * ray.d.z;
+            nr.ray.o.y = o.y + tO * ray.d.y;
+            nr.ray.o.z = o.z + tO * ray.d.z;
             nr.invDir = {1.0f, 1.0f / nr.ray.d.y, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg[0] = 0;
             nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.y < 0.0f);
             nr.dirIsNeg[2] = static_cast<int>(nr.ray.d.z < 0.0f);
             break;			
 	    case 1:
-		    nr.ray.o.x = ray.o.x + tO * ray.d.x;
-            nr.ray.o.z = ray.o.z + tO * ray.d.z;
+		    nr.ray.o.x = o.x + tO * ray.d.x;
+            nr.ray.o.z = o.z + tO * ray.d.z;
             nr.invDir = {1.0f / nr.ray.d.x, 1.0f, 1.0f / nr.ray.d.z};
             nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
-            nr.dirIsNeg[1] = 0;
             nr.dirIsNeg[2] = static_cast<int>(nr.ray.d.z < 0.0f);
             break;			
 	    case 2:
-		    nr.ray.o.x = ray.o.x + tO * ray.d.x;
-            nr.ray.o.y = ray.o.y + tO * ray.d.y;
+		    nr.ray.o.x = o.x + tO * ray.d.x;
+            nr.ray.o.y = o.y + tO * ray.d.y;
             nr.invDir = {1.0f / nr.ray.d.x, 1.0f / nr.ray.d.y, 1.0f};
             nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
             nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.y < 0.0f);
-            nr.dirIsNeg[2] = 0;
             break;
     };    
     return nr;
@@ -291,8 +295,7 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray)
 
 Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
     // Translate BVH nodes to positive octant to make normalized ray AABB intersection work
-    const Bounds3f worldBound = WorldBound();
-    Vector3f offset{-worldBound.pMin};
+    Vector3f offset{-root->bounds.pMin};
     // Be conservative and add a small epsilon to the offset
     const auto eps = std::max({std::abs(offset.x), std::abs(offset.y), std::abs(offset.z)}) * gamma(3);
     offset += Vector3f{eps, eps, eps};
