@@ -3,12 +3,12 @@
 LookAt 0 0 8   0 0 0   0 1 0
 Camera "perspective" "float fov" [45]
 
-Film "image" "string filename" "plane.exr"
+Film "image" "string filename" "plane_nr.exr"
     "integer xresolution" [64] "integer yresolution" [64]
 
 Sampler "sobol" "integer pixelsamples" [128]
 Integrator "path"
-Accelerator "bvh"
+Accelerator "bvhnr"
 
 WorldBegin
 
