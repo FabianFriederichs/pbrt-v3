@@ -185,8 +185,9 @@ BVHNRAccel::BVHNRAccel(std::vector<std::shared_ptr<Primitive>> p,
                    int maxPrimsInNode, SplitMethod splitMethod)
     : maxPrimsInNode(std::min(255, maxPrimsInNode)),
       splitMethod(splitMethod),
-      primitives(std::move(p)),
-      bvhSpaceOffset{} {
+      primitives(std::move(p))//,
+      //bvhSpaceOffset{} 
+{
     ProfilePhase _(Prof::AccelConstruction);
     if (primitives.empty()) return;
     // Build BVH from _primitives_
@@ -210,7 +211,7 @@ BVHNRAccel::BVHNRAccel(std::vector<std::shared_ptr<Primitive>> p,
     primitives.swap(orderedPrims);
     primitiveInfo.resize(0);
     // Translate BVs to positive octant
-    const auto nroffset{translateToPositiveOctant(root)};
+    //const auto nroffset{translateToPositiveOctant(root)};
     LOG(INFO) << StringPrintf("BVH created with %d nodes for %d "
                               "primitives (%.2f MB), arena allocated %.2f MB",
                               totalNodes, (int)primitives.size(),
@@ -227,7 +228,7 @@ BVHNRAccel::BVHNRAccel(std::vector<std::shared_ptr<Primitive>> p,
     flattenBVHTree(root, &offset);
     CHECK_EQ(totalNodes, offset);
     // Store nroffset
-    bvhSpaceOffset = nroffset;
+    //bvhSpaceOffset = nroffset;
 }
 
 Bounds3f BVHNRAccel::WorldBound() const {
@@ -250,7 +251,7 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
         }
     }
     // calculate class
-    const RayClass rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
+    nr.rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
     // ray direction
     nr.ray.d[i] = 1.0f;
     for (int j = 0; j < 3; ++j)
@@ -264,7 +265,7 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
     nr.dirIsNeg[i] = 0;
     // ray origin
     // first apply offset
-    const Vector3f o = Vector3f(ray.o) + bvhSpaceOffset;
+    const Vector3f o = Vector3f(ray.o);// + bvhSpaceOffset;
     const float tO = -ray.o[i] / ray.d[i];
     switch(i)
     {
@@ -294,28 +295,29 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
 }
 
 Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
-    // Translate BVH nodes to positive octant to make normalized ray AABB intersection work
-    Vector3f offset{-root->bounds.pMin};
-    // Be conservative and add a small epsilon to the offset
-    const auto eps = std::max({std::abs(offset.x), std::abs(offset.y), std::abs(offset.z)}) * gamma(3);
-    offset += Vector3f{eps, eps, eps};
+    // // Translate BVH nodes to positive octant to make normalized ray AABB intersection work
+    // Vector3f offset{-root->bounds.pMin};
+    // // Be conservative and add a small epsilon to the offset
+    // const auto eps = std::max({std::abs(offset.x), std::abs(offset.y), std::abs(offset.z)}) * gamma(3);
+    // offset += Vector3f{eps, eps, eps};
 
-    // Traverse BVH and translate nodes
-    std::vector<BVHNRBuildNode*> stack;
-    stack.reserve(64);
-    stack.push_back(root);
-    while(!stack.empty())
-    {
-        BVHNRBuildNode* node = stack.back();
-        stack.pop_back();
-        node->bounds.pMin += offset;
-        node->bounds.pMax += offset;
-        if(node->children[0]) stack.push_back(node->children[0]);
-        if(node->children[1]) stack.push_back(node->children[1]);
-    }
+    // // Traverse BVH and translate nodes
+    // std::vector<BVHNRBuildNode*> stack;
+    // stack.reserve(64);
+    // stack.push_back(root);
+    // while(!stack.empty())
+    // {
+    //     BVHNRBuildNode* node = stack.back();
+    //     stack.pop_back();
+    //     node->bounds.pMin += offset;
+    //     node->bounds.pMax += offset;
+    //     if(node->children[0]) stack.push_back(node->children[0]);
+    //     if(node->children[1]) stack.push_back(node->children[1]);
+    // }
 
-    // Return applied offset
-    return offset;
+    // // Return applied offset
+    // return offset;
+    return Vector3f{0.0f, 0.0f, 0.0f};
 }
 
 struct BucketInfo {

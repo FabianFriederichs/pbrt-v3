@@ -1,6 +1,6 @@
 # pbrt-v3 scene file
 
-LookAt 0 0 8   0 0 0   0 1 0
+LookAt 0 0 -8   0 0 0   0 1 0
 Camera "perspective" "float fov" [45]
 
 Film "image" "string filename" "plane_nr.exr"

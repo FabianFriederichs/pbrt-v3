@@ -104,7 +104,7 @@ class BVHNRAccel : public Aggregate {
     // BVHNRAccel Private Data
     const int maxPrimsInNode;
     const SplitMethod splitMethod;
-    Vector3f bvhSpaceOffset;
+    //Vector3f bvhSpaceOffset;
     std::vector<std::shared_ptr<Primitive>> primitives;
     LinearBVHNRNode *nodes = nullptr;
 };

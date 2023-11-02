@@ -6,14 +6,14 @@ Camera "perspective" "float fov" 50
 
 Film "image" "integer xresolution" 1200 "integer yresolution" 760
 #Film "image" "integer xresolution" 600 "integer yresolution" 380
-    "string filename" "bathroom_bvh.exr"
+    "string filename" "bathroom_bvh_nr.exr"
 # imgtool convert -bloomscale .1 -bloomlevel 5 bathroom.exr bathroom.png
 
 Sampler "sobol" "integer pixelsamples" 2048
 Integrator "path"
 
 # Accelerator
-Accelerator "bvh"
+Accelerator "bvhnr"
 
 
 WorldBegin
