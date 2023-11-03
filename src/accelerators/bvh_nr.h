@@ -56,8 +56,8 @@ namespace detail
   // Ray Normalization return type
   struct RayNormResult {
       Ray ray;
-      Vector3f invDir;    // Holds the reciprocal components of the ray direction, in order, except for the dominant axis
-      int dirIsNeg[3];    // Holds the sign of the ray direction, in order, except for the dominant axis
+      Vector3f invDir;    // Holds the reciprocal components of the ray direction, in order
+      int dirIsNeg[3];    // Holds the sign of the ray direction, in order
       RayClass rayClass;
       int dominantAxis;
   };

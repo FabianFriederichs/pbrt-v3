@@ -241,7 +241,6 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
     // Normalize ray (but keep original one, to do ray-primitive intersections)
     detail::RayNormResult nr{};
     // find dominant axis
-    // get dominant direction
     Float maxVal = std::numeric_limits<Float>::lowest();
     int i = 0;
     for (int j = 0; j < 3; ++j) {
@@ -258,15 +257,15 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
     {
         if(j != i) nr.ray.d[j] = ray.d[j] / ray.d[i];
     }
+    // calculate offset origin
+    const Vector3f o = Vector3f(ray.o);  // + bvhSpaceOffset;
     // ray bounds
-    nr.ray.tMin = ray.o[i] + ray.tMin * ray.d[i];
-    nr.ray.tMax = ray.o[i] + ray.tMax * ray.d[i];
+    nr.ray.tMin = o[i] + ray.tMin * ray.d[i];
+    nr.ray.tMax = o[i] + ray.tMax * ray.d[i];
     if (ray.d[i] < 0.0f) std::swap(nr.ray.tMin, nr.ray.tMax);
     nr.dirIsNeg[i] = 0;
-    // ray origin
-    // first apply offset
-    const Vector3f o = Vector3f(ray.o);// + bvhSpaceOffset;
-    const float tO = -ray.o[i] / ray.d[i];
+    // ray origin    
+    const float tO = -o[i] / ray.d[i];
     switch(i)
     {
         case 0:		
@@ -295,28 +294,28 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
 }
 
 Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
-    // // Translate BVH nodes to positive octant to make normalized ray AABB intersection work
-    // Vector3f offset{-root->bounds.pMin};
-    // // Be conservative and add a small epsilon to the offset
-    // const auto eps = std::max({std::abs(offset.x), std::abs(offset.y), std::abs(offset.z)}) * gamma(3);
-    // offset += Vector3f{eps, eps, eps};
+    //// Translate BVH nodes to positive octant to make normalized ray AABB intersection work
+    //Vector3f offset{-root->bounds.pMin};
+    //// Be conservative and add a small epsilon to the offset
+    //const auto eps = std::max({std::abs(offset.x), std::abs(offset.y), std::abs(offset.z)}) * gamma(3);
+    //offset += Vector3f{eps, eps, eps};
 
-    // // Traverse BVH and translate nodes
-    // std::vector<BVHNRBuildNode*> stack;
-    // stack.reserve(64);
-    // stack.push_back(root);
-    // while(!stack.empty())
-    // {
-    //     BVHNRBuildNode* node = stack.back();
-    //     stack.pop_back();
-    //     node->bounds.pMin += offset;
-    //     node->bounds.pMax += offset;
-    //     if(node->children[0]) stack.push_back(node->children[0]);
-    //     if(node->children[1]) stack.push_back(node->children[1]);
-    // }
+    //// Traverse BVH and translate nodes
+    //std::vector<BVHNRBuildNode*> stack;
+    //stack.reserve(64);
+    //stack.push_back(root);
+    //while(!stack.empty())
+    //{
+    //    BVHNRBuildNode* node = stack.back();
+    //    stack.pop_back();
+    //    node->bounds.pMin += offset;
+    //    node->bounds.pMax += offset;
+    //    if(node->children[0]) stack.push_back(node->children[0]);
+    //    if(node->children[1]) stack.push_back(node->children[1]);
+    //}
 
-    // // Return applied offset
-    // return offset;
+    //// Return applied offset
+    //return offset;
     return Vector3f{0.0f, 0.0f, 0.0f};
 }
 

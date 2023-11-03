@@ -1578,7 +1578,7 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
     const Float tMinX = bounds[0].x;
     const Float tMaxX = bounds[1].x;
     const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
-    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;
     const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
     const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
@@ -1634,7 +1634,7 @@ inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, const Vector3f &invDir,
     const Float tMinX = bounds[0].x;
     const Float tMaxX = bounds[1].x;
     const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
-    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y) * invDir.y;
+    const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;
     const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
     const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
@@ -1690,7 +1690,7 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
     const Float tMinY = bounds[0].y;
     const Float tMaxY = bounds[1].y;
     const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;    
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;    
     const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
     const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
@@ -1746,7 +1746,7 @@ inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, const Vector3f &invDir,
     const Float tMinY = bounds[0].y;
     const Float tMaxY = bounds[1].y;
     const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;    
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;    
     const Float tMinZ = (bounds[dirIsNeg[2]].z - ray.o.z) * invDir.z;
     const Float tMaxZ = (bounds[1 - dirIsNeg[2]].z - ray.o.z) * invDir.z;
 
@@ -1802,7 +1802,7 @@ inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, const Vector3f &invDir,
     const Float tMinZ = bounds[0].z;
     const Float tMaxZ = bounds[1].z;
     const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
     const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
     const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;    
 
@@ -1858,7 +1858,7 @@ inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, const Vector3f &invDir,
     const Float tMinZ = bounds[0].z;
     const Float tMaxZ = bounds[1].z;
     const Float tMinX = (bounds[dirIsNeg[0]].x - ray.o.x) * invDir.x;
-    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x) * invDir.x;
+    const Float tMaxX = (bounds[1 - dirIsNeg[0]].x - ray.o.x) * invDir.x;
     const Float tMinY = (bounds[dirIsNeg[1]].y - ray.o.y) * invDir.y;
     const Float tMaxY = (bounds[1 - dirIsNeg[1]].y - ray.o.y) * invDir.y;        
 
