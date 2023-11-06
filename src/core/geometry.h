@@ -864,6 +864,33 @@ class Bounds3 {
         return os;
     }
 
+    // member function pointer types
+    using IntersectFuncOptimized = bool (Bounds3::*)(const Ray&, const Vector3f&, const int[3]) const;
+    using IntersectFunc = bool (Bounds3::*)(const Ray&, Float*, Float*) const;
+
+    // constexpr member function pointer array for case distinction
+    static constexpr std::array<IntersectFuncOptimized, 6> IntersectDispatchOptimized() { 
+        return std::array<IntersectFuncOptimized, 6>{
+            &Bounds3::IntersectNRPXP,
+            &Bounds3::IntersectNRNXP,
+            &Bounds3::IntersectNRPYP,
+            &Bounds3::IntersectNRNYP,
+            &Bounds3::IntersectNRPZP,
+            &Bounds3::IntersectNRNZP
+        };
+    };
+
+    static constexpr std::array<IntersectFunc, 6> IntersectDispatch() { 
+        return std::array<IntersectFunc, 6>{
+            &Bounds3::IntersectNRPXP,
+            &Bounds3::IntersectNRNXP,
+            &Bounds3::IntersectNRPYP,
+            &Bounds3::IntersectNRNYP,
+            &Bounds3::IntersectNRPZP,
+            &Bounds3::IntersectNRNZP
+        };
+    };
+
     // Bounds3 Public Data
     Point3<T> pMin, pMax;
 };

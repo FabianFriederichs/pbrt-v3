@@ -753,17 +753,20 @@ BVHNRAccel::~BVHNRAccel() { FreeAligned(nodes); }
 
 bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     if (!nodes) return false;
-    ProfilePhase p(Prof::AccelIntersect);
-    bool hit = false;
+    ProfilePhase p(Prof::AccelIntersect);    
     // Normalize ray
     const auto nr = normalizeRay(ray);
+    // get correct member function pointer of Bounds3
+    const auto IntersectFunc = Bounds3f::IntersectDispatchOptimized()[static_cast<typename std::underlying_type<RayClass>::type>(nr.rayClass)];
+    // per case ray traversal
     // Follow ray through BVH nodes to find primitive intersections
+    bool hit = false;
     int toVisitOffset = 0, currentNodeIndex = 0;
     int nodesToVisit[64];
     while (true) {
         const LinearBVHNRNode *node = &nodes[currentNodeIndex];
         // Check ray against BVH node
-        if (node->bounds.IntersectNRP(nr.ray, nr.invDir, nr.rayClass, nr.dirIsNeg)) {
+        if ((node->bounds.*IntersectFunc)(nr.ray, nr.invDir, nr.dirIsNeg)) {
             if (node->nPrimitives > 0) {
                 // Intersect ray with primitives in leaf BVH node
                 for (int i = 0; i < node->nPrimitives; ++i)
@@ -796,12 +799,14 @@ bool BVHNRAccel::IntersectP(const Ray &ray) const {
     ProfilePhase p(Prof::AccelIntersectP);
     // Normalize ray
     const auto nr = normalizeRay(ray);
+    // get correct member function pointer of Bounds3
+    const auto IntersectFunc = Bounds3f::IntersectDispatchOptimized()[static_cast<typename std::underlying_type<RayClass>::type>(nr.rayClass)];
     // Traverse BVH nodes to find intersections
     int nodesToVisit[64];
     int toVisitOffset = 0, currentNodeIndex = 0;
     while (true) {
         const LinearBVHNRNode *node = &nodes[currentNodeIndex];
-        if (node->bounds.IntersectNRP(nr.ray, nr.invDir, nr.rayClass, nr.dirIsNeg)) {
+        if ((node->bounds.*IntersectFunc)(nr.ray, nr.invDir, nr.dirIsNeg)) {
             // Process BVH node _node_ for traversal
             if (node->nPrimitives > 0) {
                 for (int i = 0; i < node->nPrimitives; ++i) {
