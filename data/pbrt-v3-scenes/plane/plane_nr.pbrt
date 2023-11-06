@@ -1,11 +1,22 @@
 # pbrt-v3 scene file
 
-# LookAt 0 0 -8   0 0 0   0 1 0
-LookAt 8 0 0   0 0 0   0 1 0
+# PZ
+#LookAt 0 0 -8   0 0 0   0 1 0
+# NZ
+#LookAt 0 0 8   0 0 0   0 1 0
+# PY
+#LookAt 0 -8 0   0 0 0   0 0 -1
+# NY
+LookAt 0 8 0   0 0 0   0 0 1
+# PX
+#LookAt -8 0 0   0 0 0   0 1 0
+# NX
+#LookAt 8 0 0   0 0 0   0 1 0
+
 Camera "perspective" "float fov" [45]
 
 Film "image" "string filename" "plane_nr.exr"
-    "integer xresolution" [512] "integer yresolution" [512]
+    "integer xresolution" [128] "integer yresolution" [128]
 
 Sampler "sobol" "integer pixelsamples" [128]
 Integrator "path"
@@ -14,9 +25,20 @@ Accelerator "bvhnr"
 WorldBegin
 
 # White, Diffuse Plane
-AttributeBegin
-    Rotate 90.0 0.0 1.0 0.0
+AttributeBegin    
     Material "matte" "rgb Kd" [0.8 0.8 0.8]
+    # PZ
+    #Rotate 0.0 0.0 1.0 0.0
+    # NZ
+    #Rotate 180.0 0.0 1.0 0.0
+    # PY
+    #Rotate -90.0 1.0 0.0 0.0
+    # NY
+    Rotate 90.0 1.0 0.0 0.0
+    # PX
+    #Rotate 90.0 0.0 1.0 0.0
+    # NX
+    #Rotate -90.0 0.0 1.0 0.0
     Shape "trianglemesh" "point P" [ -2.5 -2.5 1.0   2.5 -2.5 1.0   -2.5 2.5 1.0   2.5 2.5 1.0 ] "integer indices" [ 0 1 2  1 3 2 ]
 AttributeEnd
 

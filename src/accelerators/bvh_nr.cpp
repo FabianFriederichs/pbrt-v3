@@ -39,6 +39,7 @@
 #include "parallel.h"
 #include <algorithm>
 #include <type_traits>
+#include <cmath>
 
 namespace pbrt {
 
@@ -272,22 +273,22 @@ detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
             nr.ray.o.y = o.y + tO * ray.d.y;
             nr.ray.o.z = o.z + tO * ray.d.z;
             nr.invDir = {1.0f, 1.0f / nr.ray.d.y, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.y < 0.0f);
-            nr.dirIsNeg[2] = static_cast<int>(nr.ray.d.z < 0.0f);
+            nr.dirIsNeg[1] = std::signbit(nr.ray.d.y);
+            nr.dirIsNeg[2] = std::signbit(nr.ray.d.z);
             break;			
 	    case 1:
 		    nr.ray.o.x = o.x + tO * ray.d.x;
             nr.ray.o.z = o.z + tO * ray.d.z;
             nr.invDir = {1.0f / nr.ray.d.x, 1.0f, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
-            nr.dirIsNeg[2] = static_cast<int>(nr.ray.d.z < 0.0f);
+            nr.dirIsNeg[0] = std::signbit(nr.ray.d.x);
+            nr.dirIsNeg[2] = std::signbit(nr.ray.d.z);
             break;			
 	    case 2:
 		    nr.ray.o.x = o.x + tO * ray.d.x;
             nr.ray.o.y = o.y + tO * ray.d.y;
             nr.invDir = {1.0f / nr.ray.d.x, 1.0f / nr.ray.d.y, 1.0f};
-            nr.dirIsNeg[0] = static_cast<int>(nr.ray.d.x < 0.0f);
-            nr.dirIsNeg[1] = static_cast<int>(nr.ray.d.y < 0.0f);
+            nr.dirIsNeg[0] = std::signbit(nr.ray.d.x);
+            nr.dirIsNeg[1] = std::signbit(nr.ray.d.y);
             break;
     };    
     return nr;

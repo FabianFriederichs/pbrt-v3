@@ -1559,7 +1559,7 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, Float *hitt0,
     Float tFar          = std::min(tMaxX, std::min(std::max(t1Y, t2Y), std::min(std::max(t1Z, t2Z), ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return intersection interval
     if (hitt0) *hitt0 = tNear;
@@ -1587,7 +1587,7 @@ inline bool Bounds3<T>::IntersectNRPXP(const Ray &ray, const Vector3f &invDir,
     Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return result
     return tNear <= tFar;
@@ -1615,7 +1615,7 @@ inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, Float *hitt0,
     Float tFar          = std::min(tMaxX, std::min(std::max(t1Y, t2Y), std::min(std::max(t1Z, t2Z), ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return intersection interval
     if (hitt0) *hitt0 = tNear;
@@ -1643,7 +1643,7 @@ inline bool Bounds3<T>::IntersectNRNXP(const Ray &ray, const Vector3f &invDir,
     Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return result
     return tNear <= tFar;
@@ -1671,7 +1671,7 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, Float *hitt0,
     Float tFar          = std::min(tMaxY, std::min(std::max(t1X, t2X), std::min(std::max(t1Z, t2Z), ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return intersection interval
     if (hitt0) *hitt0 = tNear;
@@ -1699,7 +1699,7 @@ inline bool Bounds3<T>::IntersectNRPYP(const Ray &ray, const Vector3f &invDir,
     Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return result
     return tNear <= tFar;
@@ -1727,7 +1727,7 @@ inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, Float *hitt0,
     Float tFar          = std::min(tMaxY, std::min(std::max(t1X, t2X), std::min(std::max(t1Z, t2Z), ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return intersection interval
     if (hitt0) *hitt0 = tNear;
@@ -1755,7 +1755,7 @@ inline bool Bounds3<T>::IntersectNRNYP(const Ray &ray, const Vector3f &invDir,
     Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return result
     return tNear <= tFar;
@@ -1783,7 +1783,7 @@ inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, Float *hitt0,
     Float tFar          = std::min(tMaxZ, std::min(std::max(t1X, t2X), std::min(std::max(t1Y, t2Y), ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return intersection interval
     if (hitt0) *hitt0 = tNear;
@@ -1811,7 +1811,7 @@ inline bool Bounds3<T>::IntersectNRPZP(const Ray &ray, const Vector3f &invDir,
     Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return result
     return tNear <= tFar;
@@ -1839,7 +1839,7 @@ inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, Float *hitt0,
     Float tFar          = std::min(tMaxZ, std::min(std::max(t1X, t2X), std::min(std::max(t1Y, t2Y), ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return intersection interval
     if (hitt0) *hitt0 = tNear;
@@ -1867,7 +1867,7 @@ inline bool Bounds3<T>::IntersectNRNZP(const Ray &ray, const Vector3f &invDir,
     Float tFar = std::min(tMaxX, std::min(tMaxY, std::min(tMaxZ, ray.tMax)));
 
     // Update tFar to ensure robust bounds intersection
-    tFar *= 1 + 2 * gamma(3);
+    tFar += std::abs(tFar) * 2 * gamma(3);
 
     // return result
     return tNear <= tFar;
