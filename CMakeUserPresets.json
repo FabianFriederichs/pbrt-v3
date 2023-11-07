@@ -57,8 +57,8 @@
             "binaryDir": "${sourceDir}/build/clang/debug",
             "installDir": "${sourceDir}/install/clang/debug",
             "environment": {
-                "CC": "clang",
-                "CXX": "clang++"
+                "CC": "clang-15",
+                "CXX": "clang++-15"
             },
             "cacheVariables": {
             }
@@ -71,8 +71,8 @@
             "binaryDir": "${sourceDir}/build/clang/release",
             "installDir": "${sourceDir}/install/clang/release",
             "environment": {
-                "CC": "clang",
-                "CXX": "clang++"
+                "CC": "clang-15",
+                "CXX": "clang++-15"
             },
             "cacheVariables": {
             }
@@ -85,8 +85,8 @@
             "binaryDir": "${sourceDir}/build/clang/release_wdbgi",
             "installDir": "${sourceDir}/install/clang/release_wdbgi",
             "environment": {
-                "CC": "clang",
-                "CXX": "clang++"
+                "CC": "clang-15",
+                "CXX": "clang++-15"
             },
             "cacheVariables": {
             }
