@@ -691,7 +691,7 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
                             ray, isect))
                         hit = true;
                 if (ray.tMax < tMaxPrev) {
-					const Float newTMax = ray.o[nr.dominantAxis] + ray.tMax * nr.d[nr.dominantAxis];
+					const Float newTMax = ray.o[nr.dominantAxis] + ray.tMax * ray.d[nr.dominantAxis];
                     if (isNegative(nr.rayClass))
                         nr.ray.tMin = newTMax;
                     else
