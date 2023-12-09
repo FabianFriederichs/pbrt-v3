@@ -756,6 +756,78 @@ enum class RayClass : std::uint32_t {
     nz
 };
 
+inline constexpr bool isNegative(RayClass rc) {
+    return static_cast<std::uint32_t>(rc) & std::uint32_t(1);
+}
+
+namespace detail {
+    // Ray Normalization return type
+    struct RayNormResult {
+        Ray ray;
+        Vector3f invDir;  // Holds the reciprocal components of the ray direction,
+                          // in order
+        int dirIsNeg[3];  // Holds the sign of the ray direction, in order
+        RayClass rayClass;
+        int dominantAxis;
+    };
+}  // namespace detail
+
+inline detail::RayNormResult normalizeRay(const Ray &ray) {
+    // Normalize ray (but keep original one, to do ray-primitive intersections)
+    detail::RayNormResult nr{};
+    // find dominant axis
+    Float maxVal = std::numeric_limits<Float>::lowest();
+    int i = 0;
+    for (int j = 0; j < 3; ++j) {
+        if (std::abs(ray.d[j]) > maxVal) {
+            maxVal = std::abs(ray.d[j]);
+            i = j;
+        }
+    }
+    // store dominant axis
+    nr.dominantAxis = i;
+    // calculate class
+    nr.rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
+    // ray direction
+    nr.ray.d[i] = 1.0f;
+    for (int j = 0; j < 3; ++j) {
+        if (j != i) nr.ray.d[j] = ray.d[j] / ray.d[i];
+    }
+    // calculate offset origin
+    const Vector3f o = Vector3f(ray.o);  // + bvhSpaceOffset;
+    // ray bounds
+    nr.ray.tMin = o[i] + ray.tMin * ray.d[i];
+    nr.ray.tMax = o[i] + ray.tMax * ray.d[i];
+    if (ray.d[i] < 0.0f) std::swap(nr.ray.tMin, nr.ray.tMax);
+    nr.dirIsNeg[i] = 0;
+    // ray origin
+    const float tO = -o[i] / ray.d[i];
+    switch (i) {
+    case 0:
+        nr.ray.o.y = o.y + tO * ray.d.y;
+        nr.ray.o.z = o.z + tO * ray.d.z;
+        nr.invDir = {1.0f, 1.0f / nr.ray.d.y, 1.0f / nr.ray.d.z};
+        nr.dirIsNeg[1] = std::signbit(nr.ray.d.y);
+        nr.dirIsNeg[2] = std::signbit(nr.ray.d.z);
+        break;
+    case 1:
+        nr.ray.o.x = o.x + tO * ray.d.x;
+        nr.ray.o.z = o.z + tO * ray.d.z;
+        nr.invDir = {1.0f / nr.ray.d.x, 1.0f, 1.0f / nr.ray.d.z};
+        nr.dirIsNeg[0] = std::signbit(nr.ray.d.x);
+        nr.dirIsNeg[2] = std::signbit(nr.ray.d.z);
+        break;
+    case 2:
+        nr.ray.o.x = o.x + tO * ray.d.x;
+        nr.ray.o.y = o.y + tO * ray.d.y;
+        nr.invDir = {1.0f / nr.ray.d.x, 1.0f / nr.ray.d.y, 1.0f};
+        nr.dirIsNeg[0] = std::signbit(nr.ray.d.x);
+        nr.dirIsNeg[1] = std::signbit(nr.ray.d.y);
+        break;
+    };
+    return nr;
+}
+
 template <typename T>
 class Bounds3 {
   public:

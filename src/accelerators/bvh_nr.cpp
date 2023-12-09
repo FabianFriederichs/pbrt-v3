@@ -236,90 +236,6 @@ Bounds3f BVHNRAccel::WorldBound() const {
     return nodes ? nodes[0].bounds : Bounds3f();
 }
 
-detail::RayNormResult BVHNRAccel::normalizeRay(const Ray& ray) const
-{
-    ProfilePhase p(Prof::RayNormalization);
-    // Normalize ray (but keep original one, to do ray-primitive intersections)
-    detail::RayNormResult nr{};
-    // find dominant axis
-    Float maxVal = std::numeric_limits<Float>::lowest();
-    int i = 0;
-    for (int j = 0; j < 3; ++j) {
-        if (std::abs(ray.d[j]) > maxVal) {
-            maxVal = std::abs(ray.d[j]);
-            i = j;
-        }
-    }
-    // calculate class
-    nr.rayClass = static_cast<RayClass>(ray.d[i] >= 0 ? i * 2 : i * 2 + 1);
-    // ray direction
-    nr.ray.d[i] = 1.0f;
-    for (int j = 0; j < 3; ++j)
-    {
-        if(j != i) nr.ray.d[j] = ray.d[j] / ray.d[i];
-    }
-    // calculate offset origin
-    const Vector3f o = Vector3f(ray.o);  // + bvhSpaceOffset;
-    // ray bounds
-    nr.ray.tMin = o[i] + ray.tMin * ray.d[i];
-    nr.ray.tMax = o[i] + ray.tMax * ray.d[i];
-    if (ray.d[i] < 0.0f) std::swap(nr.ray.tMin, nr.ray.tMax);
-    nr.dirIsNeg[i] = 0;
-    // ray origin    
-    const float tO = -o[i] / ray.d[i];
-    switch(i)
-    {
-        case 0:		
-            nr.ray.o.y = o.y + tO * ray.d.y;
-            nr.ray.o.z = o.z + tO * ray.d.z;
-            nr.invDir = {1.0f, 1.0f / nr.ray.d.y, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg[1] = std::signbit(nr.ray.d.y);
-            nr.dirIsNeg[2] = std::signbit(nr.ray.d.z);
-            break;			
-	    case 1:
-		    nr.ray.o.x = o.x + tO * ray.d.x;
-            nr.ray.o.z = o.z + tO * ray.d.z;
-            nr.invDir = {1.0f / nr.ray.d.x, 1.0f, 1.0f / nr.ray.d.z};
-            nr.dirIsNeg[0] = std::signbit(nr.ray.d.x);
-            nr.dirIsNeg[2] = std::signbit(nr.ray.d.z);
-            break;			
-	    case 2:
-		    nr.ray.o.x = o.x + tO * ray.d.x;
-            nr.ray.o.y = o.y + tO * ray.d.y;
-            nr.invDir = {1.0f / nr.ray.d.x, 1.0f / nr.ray.d.y, 1.0f};
-            nr.dirIsNeg[0] = std::signbit(nr.ray.d.x);
-            nr.dirIsNeg[1] = std::signbit(nr.ray.d.y);
-            break;
-    };    
-    return nr;
-}
-
-Vector3f BVHNRAccel::translateToPositiveOctant(BVHNRBuildNode* root) {
-    //// Translate BVH nodes to positive octant to make normalized ray AABB intersection work
-    //Vector3f offset{-root->bounds.pMin};
-    //// Be conservative and add a small epsilon to the offset
-    //const auto eps = std::max({std::abs(offset.x), std::abs(offset.y), std::abs(offset.z)}) * gamma(3);
-    //offset += Vector3f{eps, eps, eps};
-
-    //// Traverse BVH and translate nodes
-    //std::vector<BVHNRBuildNode*> stack;
-    //stack.reserve(64);
-    //stack.push_back(root);
-    //while(!stack.empty())
-    //{
-    //    BVHNRBuildNode* node = stack.back();
-    //    stack.pop_back();
-    //    node->bounds.pMin += offset;
-    //    node->bounds.pMax += offset;
-    //    if(node->children[0]) stack.push_back(node->children[0]);
-    //    if(node->children[1]) stack.push_back(node->children[1]);
-    //}
-
-    //// Return applied offset
-    //return offset;
-    return Vector3f{0.0f, 0.0f, 0.0f};
-}
-
 struct BucketInfo {
     int count = 0;
     Bounds3f bounds;
@@ -769,10 +685,18 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
         if ((node->bounds.*IntersectFunc)(nr.ray, nr.invDir, nr.dirIsNeg)) {
             if (node->nPrimitives > 0) {
                 // Intersect ray with primitives in leaf BVH node
+				const Float tMaxPrev = ray.tMax;
                 for (int i = 0; i < node->nPrimitives; ++i)
                     if (primitives[node->primitivesOffset + i]->Intersect(
                             ray, isect))
                         hit = true;
+                if (ray.tMax < tMaxPrev) {
+					const Float newTMax = ray.o[nr.dominantAxis] + ray.tMax * nr.d[nr.dominantAxis];
+                    if (isNegative(nr.rayClass))
+                        nr.ray.tMin = newTMax;
+                    else
+                        nr.ray.tMax = newTMax;
+				}
                 if (toVisitOffset == 0) break;
                 currentNodeIndex = nodesToVisit[--toVisitOffset];
             } else {
