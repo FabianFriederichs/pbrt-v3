@@ -69,7 +69,6 @@ class BVHNRAccel : public Aggregate {
   private:
     // BVHNRAccel Private Methods
     Vector3f translateToPositiveOctant(BVHNRBuildNode* root);
-    detail::RayNormResult normalizeRay(const Ray& ray) const;
     BVHNRBuildNode *recursiveBuild(
         MemoryArena &arena, std::vector<BVHPrimitiveInfo> &primitiveInfo,
         int start, int end, int *totalNodes,

@@ -1,15 +1,15 @@
+#include "tests/gtest/gtest.h"
 #include "geometry.h"
 #include "pbrt.h"
-#include "tests/gtest/gtest.h"
 #include <random>
 #include <vector>
 
 using namespace pbrt;
 
-struct ANRIntersectionTest
+struct ANRIntersectionTest : testing::Test
 {
     constexpr static std::size_t c_seed = 42;
-    constexpr static std::size_t c_num_pairs = 10000;    
+    constexpr static std::size_t c_num_pairs = 1000000;    
     constexpr static Float c_epsilon = 1e-4f;
     constexpr static Float c_aabb_size_min = 0.001f;
     constexpr static Float c_aabb_size_max = 1.5f;
@@ -105,7 +105,10 @@ TEST_F(ANRIntersectionTest, AxisNormalizedRayAABBIntersect) {
 
         // check results
         EXPECT_EQ(intersect_anr_res, intersect_res);
-        EXPECT_NEAR(tNear_anr, tNear, c_epsilon);
-        EXPECT_NEAR(tFar_anr, tFar, c_epsilon);
+        if (intersect_res)
+        {
+            EXPECT_NEAR(tNear_anr, tNear, c_epsilon);
+            EXPECT_NEAR(tFar_anr, tFar, c_epsilon);
+        }
     }
 }

@@ -45,6 +45,7 @@ STAT_MEMORY_COUNTER("Memory/BVH tree", treeBytes);
 STAT_RATIO("BVH/Primitives per leaf node", totalPrimitives, totalLeafNodes);
 STAT_COUNTER("BVH/Interior nodes", interiorNodes);
 STAT_COUNTER("BVH/Leaf nodes", leafNodes);
+STAT_COUNTER("BVR/Visited nodes", visitedNodes);
 
 // BVHAccel Local Declarations
 struct BVHPrimitiveInfo {
@@ -661,6 +662,7 @@ BVHAccel::~BVHAccel() { FreeAligned(nodes); }
 
 bool BVHAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     if (!nodes) return false;
+    if (ray.HasNaNs()) return false;
     ProfilePhase p(Prof::AccelIntersect);
     bool hit = false;
     Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
@@ -670,6 +672,7 @@ bool BVHAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     int nodesToVisit[64];
     while (true) {
         const LinearBVHNode *node = &nodes[currentNodeIndex];
+        ++visitedNodes;
         // Check ray against BVH node
         if (node->bounds.IntersectP(ray, invDir, dirIsNeg)) {
             if (node->nPrimitives > 0) {
@@ -701,6 +704,7 @@ bool BVHAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
 
 bool BVHAccel::IntersectP(const Ray &ray) const {
     if (!nodes) return false;
+    if (ray.HasNaNs()) return false;
     ProfilePhase p(Prof::AccelIntersectP);
     Vector3f invDir(1.f / ray.d.x, 1.f / ray.d.y, 1.f / ray.d.z);
     int dirIsNeg[3] = {invDir.x < 0, invDir.y < 0, invDir.z < 0};

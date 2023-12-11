@@ -133,5 +133,21 @@
       "cacheVariables": {
       }
     }
+  ],
+  "testPresets": [
+    {
+      "name": "release_gcc",
+      "configurePreset": "release_gcc",
+      "displayName": "Test GCC Release",
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    },
+    {
+      "name": "debug_gcc",
+      "configurePreset": "debug_gcc",
+      "displayName": "Test GCC Debug",
+      "output": {"outputOnFailure": true},
+      "execution": {"noTestsAction": "error", "stopOnFailure": true}
+    }
   ]
 }
