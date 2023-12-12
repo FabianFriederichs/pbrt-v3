@@ -47,7 +47,6 @@ STAT_MEMORY_COUNTER("Memory/BVH tree", treeBytes);
 STAT_RATIO("BVH/Primitives per leaf node", totalPrimitives, totalLeafNodes);
 STAT_COUNTER("BVH/Interior nodes", interiorNodes);
 STAT_COUNTER("BVH/Leaf nodes", leafNodes);
-STAT_COUNTER("BVR/Visited nodes", visitedNodes);
 
 // BVHNRAccel Local Declarations
 struct BVHPrimitiveInfo {
@@ -674,6 +673,7 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     ProfilePhase p(Prof::AccelIntersect);    
     // Normalize ray
     const auto nr = normalizeRay(ray);
+    int dirIsNeg[3] = {ray.d[0] < 0, ray.d[1] < 0, ray.d[2] < 0};
     // get correct member function pointer of Bounds3
     const auto IntersectFunc = Bounds3f::IntersectDispatchOptimized()[static_cast<typename std::underlying_type<RayClass>::type>(nr.rayClass)];
     // per case ray traversal
@@ -683,7 +683,6 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     int nodesToVisit[64];
     while (true) {
         const LinearBVHNRNode *node = &nodes[currentNodeIndex];
-        ++visitedNodes;
         // Check ray against BVH node
         if ((node->bounds.*IntersectFunc)(nr.ray, nr.invDir, nr.dirIsNeg)) {
             if (node->nPrimitives > 0) {
@@ -705,7 +704,7 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
             } else {
                 // Put far BVH node on _nodesToVisit_ stack, advance to near
                 // node
-                if (nr.dirIsNeg[node->axis]) {
+                if (dirIsNeg[node->axis]) {
                     nodesToVisit[toVisitOffset++] = currentNodeIndex + 1;
                     currentNodeIndex = node->secondChildOffset;
                 } else {
@@ -727,6 +726,7 @@ bool BVHNRAccel::IntersectP(const Ray &ray) const {
     ProfilePhase p(Prof::AccelIntersectP);
     // Normalize ray
     const auto nr = normalizeRay(ray);
+    int dirIsNeg[3] = {ray.d[0] < 0, ray.d[1] < 0, ray.d[2] < 0};
     // get correct member function pointer of Bounds3
     const auto IntersectFunc = Bounds3f::IntersectDispatchOptimized()[static_cast<typename std::underlying_type<RayClass>::type>(nr.rayClass)];
     // Traverse BVH nodes to find intersections
@@ -746,7 +746,7 @@ bool BVHNRAccel::IntersectP(const Ray &ray) const {
                 if (toVisitOffset == 0) break;
                 currentNodeIndex = nodesToVisit[--toVisitOffset];
             } else {
-                if (nr.dirIsNeg[node->axis]) {
+                if (dirIsNeg[node->axis]) {
                     /// second child first
                     nodesToVisit[toVisitOffset++] = currentNodeIndex + 1;
                     currentNodeIndex = node->secondChildOffset;
