@@ -673,7 +673,7 @@ bool BVHNRAccel::Intersect(const Ray &ray, SurfaceInteraction *isect) const {
     ProfilePhase p(Prof::AccelIntersect);    
     // Normalize ray
     const auto nr = normalizeRay(ray);
-    int dirIsNeg[3] = {ray.d[0] < 0, ray.d[1] < 0, ray.d[2] < 0};
+    int dirIsNeg[3] = {ray.d.x < 0.0f, ray.d.y < 0.0f, ray.d.z < 0.0f};
     // get correct member function pointer of Bounds3
     const auto IntersectFunc = Bounds3f::IntersectDispatchOptimized()[static_cast<typename std::underlying_type<RayClass>::type>(nr.rayClass)];
     // per case ray traversal
@@ -726,7 +726,7 @@ bool BVHNRAccel::IntersectP(const Ray &ray) const {
     ProfilePhase p(Prof::AccelIntersectP);
     // Normalize ray
     const auto nr = normalizeRay(ray);
-    int dirIsNeg[3] = {ray.d[0] < 0, ray.d[1] < 0, ray.d[2] < 0};
+    int dirIsNeg[3] = {ray.d.x < 0.0f, ray.d.y < 0.0f, ray.d.z < 0.0f};
     // get correct member function pointer of Bounds3
     const auto IntersectFunc = Bounds3f::IntersectDispatchOptimized()[static_cast<typename std::underlying_type<RayClass>::type>(nr.rayClass)];
     // Traverse BVH nodes to find intersections

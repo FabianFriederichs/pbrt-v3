@@ -41,6 +41,7 @@
 // core/geometry.h*
 #include "pbrt.h"
 #include "stringprint.h"
+#include "stats.h"
 #include <iterator>
 #include <array>
 #include <cstdint>
@@ -993,6 +994,7 @@ namespace detail {
 }  // namespace detail
 
 inline detail::RayNormResult normalizeRay(const Ray &ray) {
+    ProfilePhase p(Prof::RayNormalization);
     // Normalize ray (but keep original one, to do ray-primitive intersections)
     detail::RayNormResult nr{};
     // find dominant axis

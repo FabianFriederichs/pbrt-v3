@@ -8,9 +8,9 @@ using namespace pbrt;
 
 struct ANRIntersectionTest : testing::Test
 {
-    constexpr static std::size_t c_seed = 42;
+    constexpr static std::size_t c_seed = 12345;
     constexpr static std::size_t c_num_pairs = 1000000;    
-    constexpr static Float c_epsilon = 1e-4f;
+    constexpr static Float c_epsilon = 1e-5f;
     constexpr static Float c_aabb_size_min = 0.001f;
     constexpr static Float c_aabb_size_max = 1.5f;
     constexpr static Float c_origin_min = -1.0f;
