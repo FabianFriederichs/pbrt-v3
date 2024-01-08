@@ -4,13 +4,13 @@ LookAt 0 23 30  10.2 5 0   0 1 0
 Camera "perspective" "float fov" 50
    "float focaldistance" 31 "float lensradius" .15 # .2 # .4
 
-Film "image" "integer xresolution" 1280 "integer yresolution" 720
+Film "image" "integer xresolution" 1024 "integer yresolution" 1024
 #Film "image" "integer xresolution" 600 "integer yresolution" 380
     "string filename" "bathroom_bvh.exr"
 # imgtool convert -bloomscale .1 -bloomlevel 5 bathroom.exr bathroom.png
 
-Sampler "sobol" "integer pixelsamples" 2048
-Integrator "path" "integer maxdepth" [64]
+Sampler "sobol" "integer pixelsamples" 1024
+Integrator "path" "integer maxdepth" [128]
 
 # Accelerator
 Accelerator "bvh"
