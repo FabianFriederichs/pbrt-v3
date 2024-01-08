@@ -19,6 +19,7 @@
                 "CXX": "g++"
             },
             "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-pg"
             }
         },        
         {
@@ -47,6 +48,7 @@
                 "CXX": "g++"
             },
             "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-pg"
             }
         },
         {
@@ -61,6 +63,7 @@
                 "CXX": "clang++-15"
             },
             "cacheVariables": {
+                "ADDITIONAL_COMPCMAKE_CXX_FLAGS": "-pg"
             }
         },
         {
@@ -89,6 +92,7 @@
                 "CXX": "clang++-15"
             },
             "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-pg"
             }
         }
     ]
