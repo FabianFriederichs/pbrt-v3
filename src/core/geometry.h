@@ -1048,6 +1048,13 @@ inline detail::RayNormResult normalizeRay(const Ray &ray) {
         break;
     };
     return nr;
+
+    /** Floating point errors:
+     * - dir: 1 division        // none for dominant axis component
+     * - invDir: 2 divisions    // none for dominant axis component
+     * - tMin, tMax: 1 fma
+     * - origin: 1 fma          // none for dominant axis component 
+    */
 }
 
 class RayDifferential : public Ray {
